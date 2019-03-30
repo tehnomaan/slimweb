@@ -7,17 +7,12 @@ import java.util.stream.Collectors;
 import eu.miltema.slimweb.annot.Component;
 
 public class ComponentsReader {
-	static Collection<Class<?>> classesCache;
 	private Consumer<String> logger = s -> {};
 
-	private void init() throws Exception {
-		if (classesCache == null)
-			classesCache = new ClassFileScanner().setLogger(logger).findClasses("eu.miltema");
-	}
-
 	public Collection<Class<?>> getComponents() throws Exception {
-		init();
-		return classesCache.stream().filter(c -> c.isAnnotationPresent(Component.class)).collect(Collectors.toList());
+		Collection<Class<?>> classes = new ArrayList<>();
+		new ClassScanner("@Component classes").setLogger(logger).scan("eu.miltema");
+		return classes.stream().filter(c -> c.isAnnotationPresent(Component.class)).collect(Collectors.toList());
 	}
 
 	public ComponentsReader setLogger(Consumer<String> logger) {
