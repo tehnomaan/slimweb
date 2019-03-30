@@ -24,7 +24,7 @@ public class ControllerServlet extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
-			mapComponents = new ComponentsReader().setLogger(s -> log.info(s)).getComponents().stream().map(c -> new ComponentDef(c)).collect(toMap(c -> c.url, c -> c));
+			mapComponents = new ComponentsReader().setLogger(s -> log.info(s)).getComponentsAsStream().map(c -> new ComponentDef(c)).collect(toMap(c -> c.url, c -> c));
 			if (mapComponents.isEmpty())
 				log.warn("No component definitions were found");
 		} catch (Exception e) {
