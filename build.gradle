@@ -42,11 +42,11 @@ eclipse {
 			}
 		}
 	}
-    wtp {//starting with Gradle 5.3, this wtp bug hack is not necessary anymore
-        component {
-            libConfigurations += [configurations.runtimeClasspath]
-        }
-    }
+	wtp {//starting with Gradle 5.3, this wtp bug hack is not necessary anymore
+		component {
+			libConfigurations += [configurations.runtimeClasspath]
+		}
+	}
 }
 dependencies {
 	implementation 'com.google.code.gson:gson:2.8.5'
@@ -58,7 +58,7 @@ dependencies {
 }
 
 war {
-    archiveName 'slimweb.war'
+	archiveName 'slimweb.war'
 }
 
 modifyPom {
