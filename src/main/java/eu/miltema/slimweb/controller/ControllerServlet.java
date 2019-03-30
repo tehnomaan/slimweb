@@ -34,12 +34,22 @@ public class ControllerServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		serviceRequest(new HttpGetAccessor().init(req, resp));
+		serviceRequest(new HttpGetAccessor().init(req, resp, "get"));
+	}
+
+	@Override
+	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		serviceRequest(new HttpGetAccessor().init(req, resp, "delete"));
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		serviceRequest(new HttpPostAccessor().init(req, resp));
+		serviceRequest(new HttpPostAccessor().init(req, resp, "post"));
+	}
+
+	@Override
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		serviceRequest(new HttpPostAccessor().init(req, resp, "put"));
 	}
 
 	private void serviceRequest(HttpAccessor htAccessor) throws IOException {
@@ -51,10 +61,10 @@ public class ControllerServlet extends HttpServlet {
 				String actionName = htAccessor.getActionName();
 				ComponentDef cdef = mapComponents.get(componentName);
 				if (cdef == null)
-					throw new HttpException(404, "Unknown component reference /{0}", componentName);
-				MethodDef mdef = cdef.methods.get(actionName);
+					throw new HttpException(404, "Cannot map /{0} to component", componentName);
+				MethodDef mdef = cdef.methods.get(htAccessor.getMethod() + ":" + (actionName == null ? "" : actionName));
 				if (mdef == null)
-					throw new HttpException(404, "Action /{0} not found", actionName);
+					throw new HttpException(404, "Cannot map /{0} to action", actionName);
 				Gson gson = new Gson();
 				String json = htAccessor.getParametersAsJson();
 				Object component = gson.fromJson(json, cdef.clazz);

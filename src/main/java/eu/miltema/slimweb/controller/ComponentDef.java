@@ -19,7 +19,16 @@ public class ComponentDef {
 
 		for(Method method : clazz.getMethods()) {
 			MethodDef mdef = new MethodDef(method);
-			methods.put(Util.hyphenate(method.getName()), mdef);
+			String name = method.getName();
+			if (name.startsWith("get"))
+				name = "get:" + Util.hyphenate(name.substring(3));
+			else if (name.startsWith("delete"))
+				name = "delete:" + Util.hyphenate(name.substring(6));
+			else if (name.startsWith("post"))
+				name = "post:" + Util.hyphenate(name.substring(4));
+			else if (name.startsWith("put"))
+				name = "put:" + Util.hyphenate(name.substring(3));
+			methods.put(name, mdef);
 		}
 	}
 }

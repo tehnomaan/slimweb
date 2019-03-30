@@ -13,4 +13,9 @@ public class ComponentSimple {
 		fInt++;
 		return this;
 	}
+
+	public ComponentSimple getDoubleInt() {
+		fInt *= 2;
+		return this;
+	}
 }

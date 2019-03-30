@@ -7,10 +7,12 @@ abstract class HttpAccessor {
 	public HttpServletResponse response;
 	private String pi;
 	private String pathInfo[];
+	private String httpMethod;
 
-	public HttpAccessor init(HttpServletRequest request, HttpServletResponse response) {
+	public HttpAccessor init(HttpServletRequest request, HttpServletResponse response, String httpMethod) {
 		this.request = request;
 		this.response = response;
+		this.httpMethod = httpMethod;
 		this.pi = request.getPathInfo();
 		return this;
 	}
@@ -31,6 +33,10 @@ abstract class HttpAccessor {
 	public String getUrl() {
 		String q = request.getQueryString();
 		return request.getServletPath() + (pi == null ? "" : pi) + (q == null ? "" : "?" + q);
+	}
+
+	public String getMethod() {
+		return httpMethod;
 	}
 
 	abstract public String getParametersAsJson();
