@@ -42,7 +42,7 @@ eclipse {
 			}
 		}
 	}
-    wtp {
+    wtp {//starting with Gradle 5.3, this wtp bug hack is not necessary anymore
         component {
             libConfigurations += [configurations.runtimeClasspath]
         }

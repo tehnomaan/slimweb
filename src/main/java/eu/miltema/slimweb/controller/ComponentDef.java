@@ -12,6 +12,7 @@ public class ComponentDef {
 	Map<String, MethodDef> methods = new HashMap<>();
 
 	public ComponentDef(Class<?> clazz) {
+		this.clazz = clazz;
 		url = clazz.getAnnotation(Component.class).url();
 		if (url.isEmpty())
 			url = Util.hyphenate(clazz.getSimpleName());

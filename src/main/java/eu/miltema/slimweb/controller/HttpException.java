@@ -8,6 +8,7 @@ public class HttpException extends RuntimeException {
 
 	public HttpException(int httpCode, String message, String ... messageArguments) {
 		super(formatMessage(message, messageArguments));
+		this.httpCode = httpCode;
 	}
 
 	private static String formatMessage(String message, String[] messageArguments) {

@@ -3,12 +3,14 @@ package eu.miltema.slimweb;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
+import java.util.jar.JarFile;
 
 class ClassFileScanner {
 
+	private String[] includedPackageNames;
 	private String[][] packageDirs;
-	private String[] excludedDirs;
+	private Consumer<String> logger = s -> {};
 
 	/**
 	 * Find classes in specific packages
@@ -17,24 +19,43 @@ class ClassFileScanner {
 	 * @throws Exception if something goes wrong
 	 */
 	public Collection<Class<?>> findClasses(String ... includedPackageNames) throws Exception {
+		this.includedPackageNames = includedPackageNames;
 		if (includedPackageNames != null && includedPackageNames.length > 0)
 			packageDirs = Arrays.stream(includedPackageNames).map(name -> name.split("\\.")).toArray(String[][]::new);
-		else excludedDirs = Stream.of("java", "javax", "com.google", "org.apache").map(s -> s.replaceAll("\\.", "\\" + File.separator)).toArray(String[]::new);
 		Enumeration<URL> roots = Thread.currentThread().getContextClassLoader().getResources("");
 		ArrayList<Class<?>> ret = new ArrayList<>();
 		ArrayList<URL> list = Collections.list(roots);
 		for(URL url : list) {
-			File root = new File(url.toURI());
-			scanDir(0, root.getPath().length(), false, ret, root);
+			String path = url.toString();
+			logger.accept("Scanning for classes in " + path);
+			if (!path.startsWith("jar:")) {
+				File root = new File(url.getFile());
+				scanDir(0, root.getPath().length(), false, ret, root);
+			}
+			else scanJar(((JarURLConnection) url.openConnection()).getJarFile(), ret);
 		}
 		return ret;
 	}
 
+	private void scanJar(JarFile jarFile, ArrayList<Class<?>> ret) {
+		jarFile.stream().filter(j -> !j.isDirectory()).filter(j -> j.getName().endsWith(".class")).forEach(jarEntry -> {
+			String name = jarEntry.getName().split("\\.class")[0].replaceAll("/", ".");
+			boolean included = false;
+			for(String pkg : includedPackageNames)
+				if (name.startsWith(pkg + ".")) {
+					included = true;
+					break;
+				}
+			if (!included)
+				return;
+			try {
+				ret.add(Class.forName(name));
+			}
+			catch(Exception x) {}
+		});
+	}
+
 	private void scanDir(int depth, int trimLeft, boolean scanFiles, ArrayList<Class<?>> ret, File dir) throws IOException, ClassNotFoundException {
-		if (excludedDirs != null)
-			for(String dirSuffix : excludedDirs)
-				if (dir.getName().endsWith(dirSuffix))
-					return;
 		for(File file : dir.listFiles((d, name) -> !name.startsWith(".") && (d.isDirectory() || name.endsWith(".class")))) {
 			if (file.isDirectory()) {
 				String dirname = file.getName();
@@ -56,10 +77,13 @@ class ClassFileScanner {
 				try {
 					ret.add(Class.forName(path));
 				}
-				catch(Exception x) {
-					path = null;
-				}
+				catch(Exception x) {}
 			}
 		}
+	}
+
+	public ClassFileScanner setLogger(Consumer<String> logger) {
+		this.logger = logger;
+		return this;
 	}
 }
