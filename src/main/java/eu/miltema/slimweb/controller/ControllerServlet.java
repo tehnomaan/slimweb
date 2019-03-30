@@ -24,7 +24,9 @@ public class ControllerServlet extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
-			mapComponents = new ComponentsReader().getComponents().stream().map(c -> new ComponentDef(c)).collect(toMap(c -> c.url, c -> c));
+			mapComponents = new ComponentsReader().setLogger(s -> log.info(s)).getComponents().stream().map(c -> new ComponentDef(c)).collect(toMap(c -> c.url, c -> c));
+			if (mapComponents.isEmpty())
+				log.warn("No component definitions were found");
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
@@ -41,12 +43,12 @@ public class ControllerServlet extends HttpServlet {
 	}
 
 	private void serviceRequest(HttpAccessor htAccessor) throws IOException {
-		String componentName = htAccessor.getComponentName();
-		String actionName = htAccessor.getActionName();
-		String requestName = "/" + componentName + (actionName == null ? "" : "/" + actionName);
+		String requestName = htAccessor.getUrl();
 		log.info("Request " + requestName);
 		try {
 			try {
+				String componentName = htAccessor.getComponentName();
+				String actionName = htAccessor.getActionName();
 				ComponentDef cdef = mapComponents.get(componentName);
 				if (cdef == null)
 					throw new HttpException(404, "Unknown component reference /{0}", componentName);
@@ -54,7 +56,8 @@ public class ControllerServlet extends HttpServlet {
 				if (mdef == null)
 					throw new HttpException(404, "Action /{0} not found", actionName);
 				Gson gson = new Gson();
-				Object component = gson.fromJson(htAccessor.getParametersAsJson(), cdef.clazz);
+				String json = htAccessor.getParametersAsJson();
+				Object component = gson.fromJson(json, cdef.clazz);
 				Object returnValue = mdef.method.invoke(component);
 				if (returnValue != null)
 					htAccessor.response.getWriter().write(gson.toJson(returnValue));
@@ -74,13 +77,14 @@ public class ControllerServlet extends HttpServlet {
 		}
 		catch(HttpException he) {
 			htAccessor.response.sendError(he.getHttpCode(), he.getMessage());
-			log.debug("Error in " + requestName);
+			log.debug("Error " + he.getHttpCode() + "[" + he.getMessage() + "] in " + requestName);
 		}
 		finally {
 			htAccessor.response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
 			long tm = System.currentTimeMillis();
 			htAccessor.response.setDateHeader("Expires", tm);
 			htAccessor.response.setDateHeader("Last-Modified", tm);
+			htAccessor.response.flushBuffer();
 		}
 	}
 }

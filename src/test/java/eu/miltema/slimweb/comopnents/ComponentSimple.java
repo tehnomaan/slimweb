@@ -1,5 +1,8 @@
-package eu.miltema.slimweb;
+package eu.miltema.slimweb.comopnents;
 
+import eu.miltema.slimweb.annot.Component;
+
+@Component
 public class ComponentSimple {
 
 	public String fString;
