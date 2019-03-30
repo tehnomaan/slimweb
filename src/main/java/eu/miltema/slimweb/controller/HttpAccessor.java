@@ -2,7 +2,10 @@ package eu.miltema.slimweb.controller;
 
 import javax.servlet.http.*;
 
-abstract class HttpAccessor {
+abstract public class HttpAccessor {
+
+	private static final String SESSION_OBJECT = "__SESSION_OBJECT";
+
 	public HttpServletRequest request;
 	public HttpServletResponse response;
 	private String pi;
@@ -37,6 +40,20 @@ abstract class HttpAccessor {
 
 	public String getMethod() {
 		return httpMethod;
+	}
+
+	/**
+	 * Update existing or create new session object
+	 * @param sessionObject custom session object
+	 */
+	public void setSessionObject(Object sessionObject) {
+		HttpSession session = request.getSession();
+		session.setAttribute(SESSION_OBJECT, sessionObject);
+	}
+
+	public Object getSessionObject() {
+		HttpSession session = request.getSession(false);
+		return (session == null ? null : session.getAttribute(SESSION_OBJECT));
 	}
 
 	abstract public String getParametersAsJson();

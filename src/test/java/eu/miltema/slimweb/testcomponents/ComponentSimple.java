@@ -1,6 +1,9 @@
 package eu.miltema.slimweb.testcomponents;
 
+import javax.servlet.http.HttpServletRequest;
+
 import eu.miltema.slimweb.annot.Component;
+import eu.miltema.slimweb.controller.HttpAccessor;
 
 @Component
 public class ComponentSimple {
@@ -16,6 +19,16 @@ public class ComponentSimple {
 
 	public ComponentSimple getDoubleInt() {
 		fInt *= 2;
+		return this;
+	}
+
+	public String[] getRequest(HttpServletRequest request) {
+		return new String[] {"abc", "xyz"};
+	}
+
+	public ComponentSimple getSession(HttpAccessor htAccessor, DemoSession session) {
+		if (session == null)
+			htAccessor.setSessionObject(new DemoSession());
 		return this;
 	}
 }

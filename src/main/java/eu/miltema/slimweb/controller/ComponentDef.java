@@ -28,6 +28,7 @@ public class ComponentDef {
 				name = "post:" + Util.hyphenate(name.substring(4));
 			else if (name.startsWith("put"))
 				name = "put:" + Util.hyphenate(name.substring(3));
+			else continue;
 			methods.put(name, mdef);
 		}
 	}

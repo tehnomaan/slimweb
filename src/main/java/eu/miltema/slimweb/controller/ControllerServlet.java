@@ -2,7 +2,9 @@ package eu.miltema.slimweb.controller;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
+
 import static java.util.stream.Collectors.*;
 
 import javax.servlet.*;
@@ -14,19 +16,29 @@ import org.slf4j.*;
 import com.google.gson.Gson;
 
 import eu.miltema.slimweb.ComponentsReader;
+import eu.miltema.slimweb.ArgumentInjector;
 
 @WebServlet(urlPatterns={"/controller/*"})
 public class ControllerServlet extends HttpServlet {
 
 	private static final Logger log = LoggerFactory.getLogger(ControllerServlet.class);
 	private Map<String, ComponentDef> mapComponents;
+	private Map<Class<?>, ArgumentInjector> mapInjectors = new HashMap<>();
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
-			mapComponents = new ComponentsReader().setLogger(s -> log.info(s)).getComponentsAsStream().map(c -> new ComponentDef(c)).collect(toMap(c -> c.url, c -> c));
+			ComponentsReader cr = new ComponentsReader();
+			mapComponents = cr.setLogger(s -> log.info(s)).getComponentsAsStream().map(c -> new ComponentDef(c)).collect(toMap(c -> c.url, c -> c));
 			if (mapComponents.isEmpty())
 				log.warn("No component definitions were found");
+
+			mapInjectors.put(HttpAccessor.class, a -> a);
+			mapInjectors.put(HttpServletRequest.class, a -> a.request);
+			mapInjectors.put(HttpServletResponse.class, a -> a.response);
+			mapInjectors.put(HttpSession.class, a -> a.request.getSession(false));
+			cr.getInitializer().registerInjectors(mapInjectors);
+			mapComponents.values().forEach(cdef -> cdef.methods.values().forEach(mdef -> mdef.init(mapInjectors)));
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
@@ -68,7 +80,7 @@ public class ControllerServlet extends HttpServlet {
 				Gson gson = new Gson();
 				String json = htAccessor.getParametersAsJson();
 				Object component = gson.fromJson(json, cdef.clazz);
-				Object returnValue = mdef.method.invoke(component);
+				Object returnValue = mdef.invoke(component, htAccessor);
 				if (returnValue != null)
 					htAccessor.response.getWriter().write(gson.toJson(returnValue));
 			}

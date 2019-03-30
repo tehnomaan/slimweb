@@ -38,4 +38,8 @@ public class ComponentsReader {
 		this.logger = logger;
 		return this;
 	}
+
+	public ApplicationInitializer getInitializer() {
+		return initializer;
+	}
 }

@@ -56,3 +56,55 @@ dependencies {
 ```
 
 Slimweb itself depends on couple of libraries, which are resolved by build system automatically.
+
+## Session
+
+To store a single piece of information in session, these patterns can be used in a component class:
+
+```java
+	public Integer get(HttpAccessor htAccessor) {
+		Integer userId = (Integer) htAccessor.request.getSession().getAttribute("userId"); //fetch userId from session
+		htAccessor.request.getSession().setAttribute("userId", userId); //save userId in session
+	}
+```
+
+In a more complex application, multiple attributes have to be stored in session.
+Then it sometimes makes sense to declare a dedicated session object and register its injector.
+Injector makes it possible to have that session object as method parameter.
+
+```java
+public class MySession { // this class holds all the details to store in session
+	public int userId;
+}
+
+public class SlimwebInitializer implements ApplicationInitializer {
+	@Override
+	public void registerInjectors(Map<Class<?>, ArgumentInjector> mapInjectors) {
+		mapInjectors.put(MySession.class, HttpAccessor::getSessionObject); // register MySession injector
+	}
+}
+
+public class MyComponent {
+	public Integer get(HttpAccessor htAccessor, MySession session) {
+		if (session == null)
+			htAccessor.setSessionObject(session = new MySession());// put MySession details into session
+		return session.userId;
+	}
+}
+```
+
+## Methods and Arguments in Component
+
+In previous topic, session injector was defined.
+In fact, it is possible to declare methods with any argument type as long as appropriate injector has been registered with ApplicationInitializer.
+By default, Slimweb supports these method argument types: HttpSession, HttpServletRequest, HttpServletResponse, HttpAccessor
+
+In component, methods have special naming convention. Below is a table with some url-to-method mapping examples (in class MyComponent):
+
+| http   | url                            | Java method  |
+|--------|--------------------------------|--------------|
+| GET    | /controller/my-component/users | getUsers()   |
+| GET    | /controller/my-component       | get()        |
+| POST   | /controller/my-component/user  | postUser()   |
+| PUT    | /controller/my-component       | put()        |
+| DELETE | /controller/my-component/user  | deleteUser() |
