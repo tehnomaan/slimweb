@@ -37,7 +37,7 @@ abstract class FileScanner<T> {
 			String path = url.toString();
 			logger.accept("Scanning for " + searchSubject + " in " + path);
 			if (!path.startsWith("jar:")) {
-				File root = new File(url.getFile());
+				File root = new File(URLDecoder.decode(url.getFile(), "utf8"));
 				path = root.toString();
 				scanDir(root, path.length() + (path.endsWith("\\") || path.endsWith("/") ? 0 : 1));
 			}

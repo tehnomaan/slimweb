@@ -12,95 +12,35 @@ buildscript {
 		classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
 	}
 }
+
 plugins {
 	id 'io.codearte.nexus-staging' version '0.20.0'
 }
-repositories {
-	mavenCentral()
-}
-apply plugin: 'java-library'
-apply plugin: 'war'
-apply plugin: 'eclipse'
-apply plugin: 'com.bmuschko.nexus'
-apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty.plugin'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+allprojects {
+	repositories {
+		mavenCentral()
+	}
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+	apply plugin: 'eclipse-wtp'
+	
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
 
-group = "eu.miltema"
-archivesBaseName = "slimweb"
-version = "0.0.1-SNAPSHOT"
-
-eclipse {
-	classpath {
-		defaultOutputDir = file('build/default')
-		file.whenMerged {
-			entries.each { source ->
-				if (source.kind == 'src' && !source.path.startsWith('/')) { // only Source-folders in the project starting with '/' are project-references
-					source.output = null // use default Output for all source-folders; without this, eclipse nested path errors would occur
+	eclipse {
+		classpath {
+			defaultOutputDir = file('build/default')
+			file.whenMerged {
+				entries.each { source ->
+					if (source.kind == 'src' && !source.path.startsWith('/')) { // only Source-folders in the project starting with '/' are project-references
+						source.output = null // use default Output for all source-folders; without this, eclipse nested path errors would occur
+					}
 				}
 			}
 		}
 	}
-	wtp {//starting with Gradle 5.3, this wtp bug hack is not necessary anymore
-		component {
-			libConfigurations += [configurations.runtimeClasspath]
-		}
-	}
-}
-dependencies {
-	implementation 'com.google.code.gson:gson:2.8.5'
-	api 'org.slf4j:slf4j-api:1.7.26'
-	api 'ch.qos.logback:logback-classic:1.2.3'
-	providedCompile 'javax.servlet:javax.servlet-api:4.0.1'
-	testImplementation 'junit:junit:4.12'
-	testImplementation 'com.codeborne:selenide:5.2.2'
 }
 
-war {
-	archiveName 'slimweb.war'
-}
-
-modifyPom {
-	project {
-	name 'Slimweb'
-		description 'A lightweight web MVC controller library'
-		url 'https://github.com/tehnomaan/slimweb'
-		scm {
-			connection 'scm:git:git://github.com/tehnomaan/slimweb.git'
-			developerConnection 'scm:git:git://github.com/tehnomaan/slimweb.git'
-			url 'https://github.com/tehnomaan/slimweb'
-		}
-		licenses {
-			license {
-				name 'GNU General Public License, Version 3'
-				url 'https://www.gnu.org/licenses/gpl-3.0.html'
-				distribution 'repo'
-			}
-		}
-		developers {
-			developer {
-				id 'margus'
-				name 'Margus Selge'
-				email 'margus.selge@gmail.com'
-			}
-		}
-	}
-}
-extraArchive {
-	sources = true
-	tests = true
-	javadoc = true
-}
-nexus {
-	sign = true
-	repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-	snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
-}
-nexusStaging {
-}
-
-/*gretty {
-    httpPort = 9000
-    contextPath = '/slimweb'
-}*/
+sourceCompatibility = 1.8
+targetCompatibility = 1.8

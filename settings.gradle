@@ -1,1 +1,2 @@
 rootProject.name = 'slimweb'
+include 'slimwebjar', 'testweb'

@@ -1,0 +1,68 @@
+/*
+ * gradle clean install  - delete all previous versions and build nexus jars
+ * gradle upload  - upload to Nexus server
+ * gradle closeAndReleaseRepository
+ */
+
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'com.bmuschko.nexus'
+apply plugin: 'eclipse-wtp'
+
+dependencies {
+	implementation 'com.google.code.gson:gson:2.8.5'
+	api 'org.slf4j:slf4j-api:1.7.26'
+	api 'ch.qos.logback:logback-classic:1.2.3'
+	compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+	testImplementation 'javax.servlet:javax.servlet-api:4.0.1'
+	testImplementation 'junit:junit:4.12'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = "eu.miltema"
+archivesBaseName = "slimweb"
+version = "0.0.2-SNAPSHOT"
+
+modifyPom {
+	project {
+		name 'Slimweb'
+		description 'A lightweight web MVC controller library'
+		url 'https://github.com/tehnomaan/slimweb'
+		scm {
+			connection 'scm:git:git://github.com/tehnomaan/slimweb.git'
+			developerConnection 'scm:git:git://github.com/tehnomaan/slimweb.git'
+			url 'https://github.com/tehnomaan/slimweb'
+		}
+		licenses {
+			license {
+				name 'GNU General Public License, Version 3'
+				url 'https://www.gnu.org/licenses/gpl-3.0.html'
+				distribution 'repo'
+			}
+		}
+		developers {
+			developer {
+				id 'margus'
+				name 'Margus Selge'
+				email 'margus.selge@gmail.com'
+			}
+		}
+	}
+}
+
+extraArchive {
+	sources = true
+	tests = true
+	javadoc = true
+}
+
+nexus {
+	sign = true
+	repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+	snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+}
+
+nexusStaging {
+}

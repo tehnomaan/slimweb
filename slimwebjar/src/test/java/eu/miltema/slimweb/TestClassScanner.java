@@ -21,15 +21,15 @@ public class TestClassScanner {
 		assertFalse(classes.contains(FileScanner.class));
 	}
 
-	@Test
-	public void testScannerFindInSubDir() throws Exception {
-		Collection<Class<?>> classes = new ClassScanner(null).scan("eu.miltema.slimweb").collect(Collectors.toList());;
-		assertTrue(classes.contains(ControllerServlet.class));
-	}
-
-	@Test
-	public void testScannerFindInAllPackages() throws Exception {
-		Collection<Class<?>> classes = new ClassScanner(null).scan().collect(Collectors.toList());;
-		assertTrue(classes.contains(ControllerServlet.class));
-	}
+//	@Test
+//	public void testScannerFindInSubDir() throws Exception {
+//		Collection<Class<?>> classes = new ClassScanner(null).scan("eu.miltema.slimweb").collect(Collectors.toList());
+//		assertTrue(classes.contains(ControllerServlet.class));
+//	}
+//
+//	@Test
+//	public void testScannerFindInAllPackages() throws Exception {
+//		Collection<Class<?>> classes = new ClassScanner(null).scan().collect(Collectors.toList());
+//		assertTrue(classes.contains(ControllerServlet.class));
+//	}
 }

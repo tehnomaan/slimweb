@@ -10,7 +10,7 @@ public class ClassScanner extends FileScanner<Class<?>> {
 		try {
 			return Class.forName(toClassName(relativePath));
 		}
-		catch(Exception x) {
+		catch(Throwable t) {
 			return null;
 		}
 	}
