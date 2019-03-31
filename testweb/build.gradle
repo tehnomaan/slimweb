@@ -3,20 +3,15 @@
  * gradle appRun  - build and run server on http://localhost:9000/slimweb
  */
 
-apply plugin: 'java'
+//apply plugin: 'java'
 apply plugin: 'war'
-apply plugin: 'eclipse-wtp'
 
 dependencies {
 	implementation project(':slimwebjar')
-	testImplementation 'junit:junit:4.12'
 	testImplementation 'com.codeborne:selenide:5.2.2'
 }
 
 apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty.plugin'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 eclipse {
 	wtp {

@@ -4,10 +4,9 @@
  * gradle closeAndReleaseRepository
  */
 
-apply plugin: 'java'
+//apply plugin: 'java'
 apply plugin: 'java-library'
 apply plugin: 'com.bmuschko.nexus'
-apply plugin: 'eclipse-wtp'
 
 dependencies {
 	implementation 'com.google.code.gson:gson:2.8.5'
@@ -15,11 +14,7 @@ dependencies {
 	api 'ch.qos.logback:logback-classic:1.2.3'
 	compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
 	testImplementation 'javax.servlet:javax.servlet-api:4.0.1'
-	testImplementation 'junit:junit:4.12'
 }
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 group = "eu.miltema"
 archivesBaseName = "slimweb"

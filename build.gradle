@@ -25,6 +25,9 @@ allprojects {
 	apply plugin: 'eclipse'
 	apply plugin: 'eclipse-wtp'
 	
+	dependencies {
+		testImplementation 'junit:junit:4.12'
+	}
 	sourceCompatibility = 1.8
 	targetCompatibility = 1.8
 
@@ -41,6 +44,3 @@ allprojects {
 		}
 	}
 }
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
