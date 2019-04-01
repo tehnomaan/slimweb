@@ -22,7 +22,6 @@ allprojects {
 		mavenCentral()
 	}
 	apply plugin: 'java'
-	apply plugin: 'eclipse'
 	apply plugin: 'eclipse-wtp'
 	
 	dependencies {
