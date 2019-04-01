@@ -1,7 +1,6 @@
 package eu.miltema.slimweb.controller;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,14 +21,19 @@ import eu.miltema.slimweb.ArgumentInjector;
 public class ControllerServlet extends HttpServlet {
 
 	private static final Logger log = LoggerFactory.getLogger(ControllerServlet.class);
-	private Map<String, ComponentDef> mapComponents;
+	private Map<String, ComponentDef> mapComponents;//urlName->component
+	private Map<Class<?>, ComponentDef> mapComponentClasses = new HashMap<Class<?>, ComponentDef>();//class->component
 	private Map<Class<?>, ArgumentInjector> mapInjectors = new HashMap<>();
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
 			ComponentsReader cr = new ComponentsReader();
-			mapComponents = cr.setLogger(s -> log.info(s)).getComponentsAsStream().map(c -> new ComponentDef(c)).collect(toMap(c -> c.url, c -> c));
+			mapComponents = cr.setLogger(s -> log.info(s)).
+					getComponentsAsStream().
+					map(c -> new ComponentDef(c)).
+					peek(c -> mapComponentClasses.put(c.clazz, c)).
+					collect(toMap(c -> c.url, c -> c));
 			if (mapComponents.isEmpty())
 				log.warn("No component definitions were found");
 
@@ -84,14 +88,17 @@ public class ControllerServlet extends HttpServlet {
 				if (returnValue != null)
 					htAccessor.response.getWriter().write(gson.toJson(returnValue));
 			}
-			catch(IllegalAccessException iae) {
-				log.error("", iae);
-				throw new HttpException(500, "Service internal error");
+			catch(Redirect redirect) {
+				ComponentDef cdef = mapComponentClasses.get(redirect.targetComponent);
+				if (cdef == null)
+					throw new HttpException(500, "Redirecting to non-@Component " + redirect.targetComponent.getName() + " is not allowed");
+				htAccessor.response.setHeader("Location", "/view/" + cdef.url);
+				htAccessor.response.setStatus(303);//Using htAccessor.response.sendRedirect would return status code 302, which is inaccurate
 			}
-			catch(InvocationTargetException ite) {
-				Throwable t = ite.getCause();
-				if (t instanceof HttpException)
-					throw (HttpException) t;
+			catch(HttpException he) {
+				throw he;
+			}
+			catch(Throwable t) {
 				log.error("", t);
 				throw new HttpException(500, "Service internal error");
 			}

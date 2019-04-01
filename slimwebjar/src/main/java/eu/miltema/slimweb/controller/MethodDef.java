@@ -26,10 +26,15 @@ public class MethodDef {
 		}
 	}
 
-	public Object invoke(Object component, HttpAccessor htAccessor) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		Object[] args = new Object[injectors.length];
-		for(int i = 0; i < args.length; i++)
-			args[i] = injectors[i].apply(htAccessor);
-		return method.invoke(component, args);
+	public Object invoke(Object component, HttpAccessor htAccessor) throws Throwable {
+		try {
+			Object[] args = new Object[injectors.length];
+			for(int i = 0; i < args.length; i++)
+				args[i] = injectors[i].apply(htAccessor);
+			return method.invoke(component, args);
+		}
+		catch(InvocationTargetException ite) {
+			throw ite.getCause();
+		}
 	}
 }

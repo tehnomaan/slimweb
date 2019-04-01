@@ -16,11 +16,13 @@ public class TestBasicComponents {
 	private static HttpClient httpClient = HttpClient.newBuilder().build();
 
 	protected String response;
+	protected HttpHeaders headers;
 
 	private String sendRequest(String componentPath, Function<Builder, Builder> methodBuilder) throws IOException, InterruptedException {
 		String uri = "http://localhost:8080/testweb/controller/" + (componentPath.startsWith("/") ? componentPath.substring(1) : componentPath);
 		HttpRequest request = methodBuilder.apply(HttpRequest.newBuilder().uri(URI.create(uri))).build();
 		HttpResponse<String> httpResponse = httpClient.send(request, BodyHandlers.ofString());
+		headers = httpResponse.headers();
 		if (httpResponse.statusCode() >= 300)
 			throw new IOException("Http status code " + httpResponse.statusCode());
 		return (response = httpResponse.body());
@@ -77,5 +79,17 @@ public class TestBasicComponents {
 	@Test
 	public void testPut() throws Exception {
 		assertTrue(put("/component-simple/integer", "{fInt:100}").contains("300"));
+	}
+
+	@Test
+	public void testRedirect() throws Exception {
+		try {
+			get("/component-simple/redirect");
+			assertFalse("IOException with redirect should have occured", true);
+		}
+		catch(IOException ioe) {
+			assertEquals("Http status code 303", ioe.getMessage());
+			assertEquals("/view/c2", headers.firstValue("Location").get());
+		}
 	}
 }

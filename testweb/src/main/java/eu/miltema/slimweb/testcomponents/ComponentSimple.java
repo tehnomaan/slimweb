@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import eu.miltema.slimweb.annot.Component;
 import eu.miltema.slimweb.controller.HttpAccessor;
+import eu.miltema.slimweb.controller.Redirect;
 
 @Component
 public class ComponentSimple {
@@ -42,5 +43,9 @@ public class ComponentSimple {
 
 	public int putInteger() {
 		return fInt + 200;
+	}
+
+	public void getRedirect() {
+		throw new Redirect(Component2.class);
 	}
 }

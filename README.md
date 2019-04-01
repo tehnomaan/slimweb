@@ -108,3 +108,14 @@ In component, methods have special naming convention. Below is a table with some
 | POST   | /controller/my-component/user  | postUser()   |
 | PUT    | /controller/my-component       | put()        |
 | DELETE | /controller/my-component/user  | deleteUser() |
+
+## Redirecting
+
+Especially after PUT and POST, there is often a need to redirect (to a list). The component redirects to another "target" component.
+However, Slimweb redirects that request to a view instead - a view, which is associated with the target component.
+
+```java
+	public void post() {
+		throw new Redirect(MyListComponent.class);
+	}
+```
