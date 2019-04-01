@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 public @interface Component {
 
 	/**
-	 * @return URL of this component relative to controller path
+	 * @return component name in URL path, for example "mycomponent"
 	 */
-	String url() default "";
+	String urlName() default "";
 }

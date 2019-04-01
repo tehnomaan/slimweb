@@ -31,4 +31,16 @@ public class ComponentSimple {
 			htAccessor.setSessionObject(new DemoSession());
 		return this;
 	}
+
+	public int delete() {
+		return ++fInt;
+	}
+
+	public int postInteger() {
+		return fInt + 1;
+	}
+
+	public int putInteger() {
+		return fInt + 200;
+	}
 }

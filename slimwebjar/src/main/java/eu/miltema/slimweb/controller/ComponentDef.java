@@ -13,7 +13,7 @@ public class ComponentDef {
 
 	public ComponentDef(Class<?> clazz) {
 		this.clazz = clazz;
-		url = clazz.getAnnotation(Component.class).url();
+		url = clazz.getAnnotation(Component.class).urlName();
 		if (url.isEmpty())
 			url = Util.hyphenate(clazz.getSimpleName());
 

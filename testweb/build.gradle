@@ -1,16 +1,12 @@
-/*
- * gradle clean install  - delete all previous versions and build nexus jars
- * gradle appRun  - build and run server on http://localhost:9000/slimweb
- */
-
 apply plugin: 'war'
 
 dependencies {
+	testImplementation 'javax.servlet:javax.servlet-api:4.0.1'
 	implementation project(':slimwebjar')
-	testImplementation 'com.codeborne:selenide:5.2.2'
 }
 
-apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty.plugin'
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
 
 eclipse {
 	wtp {
@@ -22,10 +18,4 @@ eclipse {
 
 war {
 	archiveName 'testweb.war'
-}
-
-gretty {
-    httpPort = 9000
-    httpEnabled = true
-    contextPath = '/testweb'
 }
