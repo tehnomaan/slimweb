@@ -1,12 +1,9 @@
 apply plugin: 'war'
 
 dependencies {
-	testImplementation 'javax.servlet:javax.servlet-api:4.0.1'
+	implementation 'javax.servlet:javax.servlet-api:4.0.1'
 	implementation project(':slimwebjar')
 }
-
-sourceCompatibility = 1.11
-targetCompatibility = 1.11
 
 eclipse {
 	wtp {

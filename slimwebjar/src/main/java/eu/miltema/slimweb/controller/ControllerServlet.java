@@ -44,6 +44,7 @@ public class ControllerServlet extends HttpServlet {
 			cr.getInitializer().registerInjectors(mapInjectors);
 			mapComponents.values().forEach(cdef -> cdef.methods.values().forEach(mdef -> mdef.init(mapInjectors)));
 		} catch (Exception e) {
+			log.error("", e);
 			throw new ServletException(e);
 		}
 	}

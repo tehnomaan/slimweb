@@ -1,9 +1,12 @@
 package eu.miltema.slimweb;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import eu.miltema.slimweb.annot.Component;
+import eu.miltema.slimweb.rcscanner.ClassScanner;
+import eu.miltema.slimweb.rcscanner.FileContentSupplier;
 
 public class ComponentsReader {
 	private Consumer<String> logger = s -> {};
@@ -21,9 +24,9 @@ public class ComponentsReader {
 						return null;
 					Class<?> initializerClass = super.entryFound(relativePath, fileContentSupplier);
 					try {
-						initializer = (ApplicationInitializer) initializerClass.newInstance();
+						initializer = (ApplicationInitializer) initializerClass.getDeclaredConstructor().newInstance();
 						throw new InitializerFoundException();
-					} catch (InstantiationException | IllegalAccessException | ClassCastException e) {
+					} catch (InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
 						throw new RuntimeException("Unable to instantiate initializer class " + initializerClass.getName() + ", which must implement interface ApplicationInitializer", e);
 					}
 				}
