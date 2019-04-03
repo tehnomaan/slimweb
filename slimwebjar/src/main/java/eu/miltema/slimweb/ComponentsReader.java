@@ -1,14 +1,15 @@
 package eu.miltema.slimweb;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import eu.miltema.slimweb.annot.Component;
-import eu.miltema.slimweb.rcscanner.ClassScanner;
-import eu.miltema.slimweb.rcscanner.FileContentSupplier;
+import eu.miltema.slimweb.rcscanner.*;
 
 public class ComponentsReader {
+	private static Collection<Class<?>> cachedComponents;
 	private Consumer<String> logger = s -> {};
 	private ApplicationInitializer initializer;
 
@@ -16,6 +17,8 @@ public class ComponentsReader {
 	}
 
 	public Stream<Class<?>> getComponentsAsStream() throws Exception {
+		if (cachedComponents != null)
+			return cachedComponents.stream();
 		try {
 			new ClassScanner("SlimwebInitializer") {
 				@Override
@@ -34,7 +37,12 @@ public class ComponentsReader {
 			throw new Exception("Could not find class SlimwebInitializer; unable to initialize Slimweb");
 		}
 		catch(InitializerFoundException ife) {}//initializer was found, let's continue
-		return new ClassScanner("@Component classes").setLogger(logger).scan(initializer.getComponentPackages()).filter(c -> c.isAnnotationPresent(Component.class));
+		cachedComponents = new ArrayList<>();
+		return new ClassScanner("@Component classes").
+				setLogger(logger).
+				scan(initializer.getComponentPackages()).
+				filter(c -> c.isAnnotationPresent(Component.class)).
+				peek(c -> cachedComponents.add(c));
 	}
 
 	public ComponentsReader setLogger(Consumer<String> logger) {

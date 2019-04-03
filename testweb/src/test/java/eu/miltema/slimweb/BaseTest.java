@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 abstract class BaseTest {
 
-	private static HttpClient httpClient;
+	protected static HttpClient httpClient;
 
 	protected String response;
 	protected HttpHeaders headers;
