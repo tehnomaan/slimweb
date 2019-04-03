@@ -8,7 +8,7 @@ import eu.miltema.slimweb.ApplicationInitializer;
 import eu.miltema.slimweb.ArgumentInjector;
 import eu.miltema.slimweb.annot.SessionNotRequired;
 
-public class MethodDef {
+class MethodDef {
 	public Method method;
 	boolean requiresSession;
 	private ArgumentInjector[] injectors;

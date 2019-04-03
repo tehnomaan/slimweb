@@ -3,7 +3,7 @@ package eu.miltema.slimweb.rcscanner;
 import java.util.function.Predicate;
 import org.slf4j.*;
 
-public class FileScanner extends ResourceScanner<FileTuple> {
+public class FileScanner extends ClasspathScanner<FileTuple> {
 
 	private static final Logger log = LoggerFactory.getLogger(FileScanner.class);
 

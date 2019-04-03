@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 
-public class HttpPostAccessor extends HttpAccessor {
+class HttpPostAccessor extends HttpAccessor {
 
 	private String json;
 	private Map<String, String> parameters;

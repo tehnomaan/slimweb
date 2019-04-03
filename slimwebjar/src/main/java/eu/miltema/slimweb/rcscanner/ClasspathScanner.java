@@ -8,7 +8,7 @@ import java.util.jar.JarFile;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
-abstract public class ResourceScanner<T> {
+abstract public class ClasspathScanner<T> {
 
 	private String[] includedFolderNames;
 	private Consumer<String> logger = s -> {};
@@ -16,7 +16,7 @@ abstract public class ResourceScanner<T> {
 	private Builder<T> streamBuilder = Stream.builder();
 	private Predicate<String> filenameFilter;
 
-	public ResourceScanner(String searchSubject, Predicate<String> filenameFilter) {
+	public ClasspathScanner(String searchSubject, Predicate<String> filenameFilter) {
 		this.searchSubject = searchSubject;
 		this.filenameFilter = filenameFilter;
 	}
@@ -74,7 +74,7 @@ abstract public class ResourceScanner<T> {
 		}
 	}
 
-	public ResourceScanner<T> setLogger(Consumer<String> logger) {
+	public ClasspathScanner<T> setLogger(Consumer<String> logger) {
 		this.logger = logger;
 		return this;
 	}

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 
-public class HttpGetAccessor extends HttpAccessor {
+class HttpGetAccessor extends HttpAccessor {
 
 	@Override
 	public String getParametersAsJson() {

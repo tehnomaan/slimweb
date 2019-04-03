@@ -3,15 +3,11 @@ package eu.miltema.slimweb;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.List;
-
+import java.util.*;
 import static java.util.stream.Collectors.*;
-
 import org.junit.Test;
-
 import eu.miltema.slimweb.annot.Component;
-import eu.miltema.slimweb.controller.ComponentDef;
+import eu.miltema.slimweb.controller.HttpAccessor;
 import eu.miltema.slimweb.rcscanner.*;
 
 public class TestResourceScanner {
@@ -19,7 +15,7 @@ public class TestResourceScanner {
 	@Test
 	public void testScannerFindInDir() throws Exception {
 		Collection<Class<?>> classes = new ClassScanner(null).scan("eu.miltema.slimweb.controller").collect(toList());
-		assertTrue(classes.contains(ComponentDef.class));
+		assertTrue(classes.contains(HttpAccessor.class));
 		assertFalse(classes.contains(Component.class));
 		assertFalse(classes.contains(FileScanner.class));
 	}
@@ -27,13 +23,13 @@ public class TestResourceScanner {
 	@Test
 	public void testScannerFindInSubDir() throws Exception {
 		Collection<Class<?>> classes = new ClassScanner(null).scan("eu.miltema.slimweb").collect(toList());
-		assertTrue(classes.contains(ComponentDef.class));
+		assertTrue(classes.contains(HttpAccessor.class));
 	}
 
 	@Test
 	public void testScannerFindInAllPackages() throws Exception {
 		Collection<Class<?>> classes = new ClassScanner(null).scan().collect(toList());
-		assertTrue(classes.contains(ComponentDef.class));
+		assertTrue(classes.contains(HttpAccessor.class));
 	}
 
 	@Test

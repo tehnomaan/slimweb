@@ -5,7 +5,7 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ClassScanner extends ResourceScanner<Class<?>> {
+public class ClassScanner extends ClasspathScanner<Class<?>> {
 
 	private static final Logger log = LoggerFactory.getLogger(ClassScanner.class);
 

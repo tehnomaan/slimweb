@@ -5,6 +5,8 @@ import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpRequest.*;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.net.http.WebSocket.Listener;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
 abstract class BaseTest {
@@ -53,4 +55,32 @@ abstract class BaseTest {
 		return sendRequest(componentPath, b -> b.PUT(BodyPublishers.ofString(json)));
 	}
 
+	protected String getWebsocketClientResponse() throws InterruptedException {
+		StringBuilder response = new StringBuilder();
+		Listener listener = new Listener() {
+			@Override
+			public void onOpen(WebSocket webSocket) {
+				Listener.super.onOpen(webSocket);
+			}
+			@Override
+			public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
+				response.append(data);
+				synchronized (baseUrl) {
+					baseUrl.notify();
+				}
+				return Listener.super.onText(webSocket, data, last);
+			}
+			@Override
+			public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
+				return Listener.super.onClose(webSocket, statusCode, reason);
+			}
+		};
+		baseUrl = baseUrl.replaceAll("controller", "push").replace("http", "ws");
+		WebSocket ws = httpClient.newWebSocketBuilder().buildAsync(URI.create(baseUrl + "/component-push"), listener).join();
+		ws.sendText("zzz", true);
+		synchronized (baseUrl) {
+			baseUrl.wait(2000);
+		}
+		return response.toString();
+	}
 }

@@ -9,15 +9,15 @@ import javax.websocket.server.*;
 import org.slf4j.*;
 
 import eu.miltema.slimweb.ComponentsReader;
-import eu.miltema.slimweb.Util;
+import eu.miltema.slimweb.SlimwebUtil;
 
 //Vt kuidas saab kätte http sessiooni
 //1) http://stackoverflow.com/questions/21888425/accessing-servletcontext-and-httpsession-in-onmessage-of-a-jsr-356-serverendpo
 //2) http://stackoverflow.com/questions/17936440/accessing-httpsession-from-httpservletrequest-in-a-web-socket-serverendpoint
 @ServerEndpoint(value = "/push/{component}", configurator = WebsocketConfigurator.class)
-public class ServerPushWebsocketEndpoint {
+public class ServerPushEndpoint {
 
-	private static final Logger log = LoggerFactory.getLogger(ServerPushWebsocketEndpoint.class);
+	private static final Logger log = LoggerFactory.getLogger(ServerPushEndpoint.class);
 
 	private Map<String, Class<?>> mapComponents;
 
@@ -26,7 +26,7 @@ public class ServerPushWebsocketEndpoint {
 	public void onOpen(final Session session, @PathParam("component") String componentName, EndpointConfig config) {
 		try {
 			if (mapComponents == null)
-				mapComponents = new ComponentsReader().getComponentsAsStream().collect(Collectors.toMap(c -> Util.hyphenate(c.getSimpleName()), c -> c));
+				mapComponents = new ComponentsReader().getComponentsAsStream().collect(Collectors.toMap(c -> SlimwebUtil.hyphenate(c.getSimpleName()), c -> c));
 			Map<String, Object> uprops = session.getUserProperties();
 			HttpSession httpSession = (HttpSession) uprops.get(PushConst.PROPERTY_HTTP_SESSION);
 			Map<String, List<String>> params = (Map<String, List<String>>) uprops.get(PushConst.PROPERTY_PARAMETERS);
