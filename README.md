@@ -163,6 +163,9 @@ public class MyComponent {
 }
 ```
 
+By default, all components are expected to require session existence. If session does not exist, browser is redirected to login page (declared in SlimwebInitializer).
+Some components (like the login page itself) do not require session existence. Then add __@SessionNotRequired__ to entire component or alternatively just to a single method or a couple of methods.
+
 ## Redirecting
 
 Especially after PUT and POST, there is often a need to redirect (to a list). The component redirects to another "target" component.

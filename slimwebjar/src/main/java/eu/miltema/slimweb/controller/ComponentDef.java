@@ -5,14 +5,17 @@ import java.util.*;
 
 import eu.miltema.slimweb.Util;
 import eu.miltema.slimweb.annot.Component;
+import eu.miltema.slimweb.annot.SessionNotRequired;
 
 public class ComponentDef {
-	String url;
 	Class<?> clazz;
+	boolean requiresSession;
+	String url;
 	Map<String, MethodDef> methods = new HashMap<>();
 
 	public ComponentDef(Class<?> clazz) {
 		this.clazz = clazz;
+		this.requiresSession = !clazz.isAnnotationPresent(SessionNotRequired.class);
 		url = clazz.getAnnotation(Component.class).urlName();
 		if (url.isEmpty())
 			url = Util.hyphenate(clazz.getSimpleName());

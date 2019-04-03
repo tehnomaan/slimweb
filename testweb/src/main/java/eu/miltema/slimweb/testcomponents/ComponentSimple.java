@@ -3,10 +3,12 @@ package eu.miltema.slimweb.testcomponents;
 import javax.servlet.http.HttpServletRequest;
 
 import eu.miltema.slimweb.annot.Component;
+import eu.miltema.slimweb.annot.SessionNotRequired;
 import eu.miltema.slimweb.controller.HttpAccessor;
 import eu.miltema.slimweb.controller.Redirect;
 
 @Component
+@SessionNotRequired
 public class ComponentSimple {
 
 	public String fString;

@@ -15,6 +15,7 @@ import org.slf4j.*;
 import com.google.gson.Gson;
 
 import eu.miltema.slimweb.ComponentsReader;
+import eu.miltema.slimweb.ApplicationInitializer;
 import eu.miltema.slimweb.ArgumentInjector;
 
 @WebServlet(urlPatterns={"/controller/*"})
@@ -24,6 +25,7 @@ public class ControllerServlet extends HttpServlet {
 	private Map<String, ComponentDef> mapComponents;//urlName->component
 	private Map<Class<?>, ComponentDef> mapComponentClasses = new HashMap<Class<?>, ComponentDef>();//class->component
 	private Map<Class<?>, ArgumentInjector> mapInjectors = new HashMap<>();
+	private ApplicationInitializer initializer;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -41,7 +43,8 @@ public class ControllerServlet extends HttpServlet {
 			mapInjectors.put(HttpServletRequest.class, a -> a.request);
 			mapInjectors.put(HttpServletResponse.class, a -> a.response);
 			mapInjectors.put(HttpSession.class, a -> a.request.getSession(false));
-			cr.getInitializer().registerInjectors(mapInjectors);
+			initializer = cr.getInitializer();
+			initializer.registerInjectors(mapInjectors);
 			mapComponents.values().forEach(cdef -> cdef.methods.values().forEach(mdef -> mdef.init(mapInjectors)));
 		} catch (Exception e) {
 			log.error("", e);
@@ -82,6 +85,8 @@ public class ControllerServlet extends HttpServlet {
 				MethodDef mdef = cdef.methods.get(htAccessor.getMethod() + ":" + (actionName == null ? "" : actionName));
 				if (mdef == null)
 					throw new HttpException(404, "Cannot map /{0} to action", actionName);
+				if (htAccessor.request.getSession(false) == null && cdef.requiresSession && mdef.requiresSession)
+					throw new Redirect(initializer.getLoginView());
 				Gson gson = new Gson();
 				String json = htAccessor.getParametersAsJson();
 				Object component = gson.fromJson(json, cdef.clazz);
@@ -90,11 +95,15 @@ public class ControllerServlet extends HttpServlet {
 					htAccessor.response.getWriter().write(gson.toJson(returnValue));
 			}
 			catch(Redirect redirect) {
-				ComponentDef cdef = mapComponentClasses.get(redirect.targetComponent);
-				if (cdef == null)
-					throw new HttpException(500, "Redirecting to non-@Component " + redirect.targetComponent.getName() + " is not allowed");
-				htAccessor.response.setHeader("Location", "/view/" + cdef.url);
-				htAccessor.response.setStatus(303);//Using htAccessor.response.sendRedirect would return status code 302, which is inaccurate
+				String targetPath = redirect.pathToView;
+				if (targetPath == null) {
+					ComponentDef cdef = mapComponentClasses.get(redirect.targetComponent);
+					if (cdef == null)
+						throw new HttpException(500, "Redirecting to non-@Component " + redirect.targetComponent.getName() + " is not allowed");
+					targetPath = "/view/" + cdef.url;
+				}
+				htAccessor.response.setHeader("Location", targetPath);
+				htAccessor.response.setStatus(303);//Cannot use htAccessor.response.sendRedirect here: it would return status code 302, which is inaccurate
 			}
 			catch(HttpException he) {
 				throw he;

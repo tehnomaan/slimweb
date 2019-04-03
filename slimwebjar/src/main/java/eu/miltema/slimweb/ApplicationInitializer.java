@@ -14,4 +14,9 @@ public interface ApplicationInitializer {
 	 * @param mapInjectors map of injectors
 	 */
 	void registerInjectors(Map<Class<?>, ArgumentInjector> mapInjectors);
+
+	/**
+	 * @return path to view, which requires user login
+	 */
+	String getLoginView();
 }

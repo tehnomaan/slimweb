@@ -18,4 +18,9 @@ public class SlimwebInitializer implements ApplicationInitializer {
 		mapInjectors.put(DemoSession.class, HttpAccessor::getSessionObject);
 	}
 
+	@Override
+	public String getLoginView() {
+		return "login.html";
+	}
+
 }
