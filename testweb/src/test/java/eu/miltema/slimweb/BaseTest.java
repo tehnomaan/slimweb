@@ -1,7 +1,7 @@
 package eu.miltema.slimweb;
 
 import java.io.IOException;
-import java.net.URI;
+import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpRequest.*;
 import java.net.http.HttpResponse.BodyHandlers;
@@ -9,14 +9,20 @@ import java.util.function.Function;
 
 abstract class BaseTest {
 
-	private static HttpClient httpClient = HttpClient.newBuilder().build();
+	private static HttpClient httpClient;
 
 	protected String response;
 	protected HttpHeaders headers;
 	protected int statusCode;
+	protected String baseUrl = "http://localhost:8080/testweb/controller/";
+
+	public BaseTest() {
+		CookieHandler.setDefault(new CookieManager());
+		httpClient = HttpClient.newBuilder().cookieHandler(CookieHandler.getDefault()).build();
+	}
 
 	protected String sendRequest(String componentPath, Function<Builder, Builder> methodBuilder, String ... headerKeyValues) throws IOException, InterruptedException {
-		String uri = "http://localhost:8080/testweb/controller/" + (componentPath.startsWith("/") ? componentPath.substring(1) : componentPath);
+		String uri = baseUrl + (componentPath.startsWith("/") ? componentPath.substring(1) : componentPath);
 		Builder builder = HttpRequest.newBuilder().uri(URI.create(uri));
 		if (headerKeyValues != null)
 			for(int i = 0; i < headerKeyValues.length; i++)

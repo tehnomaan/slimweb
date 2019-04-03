@@ -7,17 +7,20 @@ import com.google.gson.Gson;
 
 public class HttpPostAccessor extends HttpAccessor {
 
+	private String json;
 	private Map<String, String> parameters;
 
 	@Override
 	public String getParametersAsJson() {
+		if (json != null)
+			return json;
 		try {
 			String line;
 			StringBuilder sb = new StringBuilder();
 			BufferedReader bfr = new BufferedReader(request.getReader());
 			while((line = bfr.readLine()) != null)
 				sb.append(line+"\n");
-			return sb.toString();
+			return json = sb.toString();
 		}
 		catch(Exception x) {
 			throw new HttpException(470, "Unable to read request body: {0}", x.getMessage());

@@ -1,22 +1,14 @@
 package eu.miltema.slimweb.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.*;
 import static java.util.stream.Collectors.*;
-
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-
 import org.slf4j.*;
-
 import com.google.gson.Gson;
-
-import eu.miltema.slimweb.ComponentsReader;
-import eu.miltema.slimweb.ApplicationInitializer;
-import eu.miltema.slimweb.ArgumentInjector;
+import eu.miltema.slimweb.*;
 
 @WebServlet(urlPatterns={"/controller/*"})
 public class ControllerServlet extends HttpServlet {
@@ -90,6 +82,8 @@ public class ControllerServlet extends HttpServlet {
 				Gson gson = new Gson();
 				String json = htAccessor.getParametersAsJson();
 				Object component = gson.fromJson(json, cdef.clazz);
+				if (component == null)
+					component = cdef.clazz.getConstructor().newInstance();
 				Object returnValue = mdef.invoke(component, htAccessor);
 				if (returnValue != null)
 					htAccessor.response.getWriter().write(gson.toJson(returnValue));

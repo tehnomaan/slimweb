@@ -2,6 +2,8 @@ package eu.miltema.slimweb.view;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
+
 import static java.util.function.Predicate.*;
 
 import static java.util.stream.Collectors.*;
@@ -11,6 +13,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import org.slf4j.*;
 
+import eu.miltema.slimweb.controller.HttpAccessor;
 import eu.miltema.slimweb.rcscanner.FileScanner;
 
 @WebServlet(urlPatterns={"/view/*"})
@@ -19,6 +22,17 @@ public class ViewServlet extends HttpServlet {
 	private static final Logger log = LoggerFactory.getLogger(ViewServlet.class);
 	private Map<String, Map<String, String>> localeLabels;
 	private Map<String, Map<String, String>> localetemplateFiles;
+
+	private class ViewHtAccessor extends HttpAccessor {
+		@Override
+		public String getParametersAsJson() {
+			return null;
+		}
+		@Override
+		public String getParameter(String parameterName) {
+			return null;
+		}
+	};
 
 	@Override
 	public void init() throws ServletException {
@@ -49,7 +63,7 @@ public class ViewServlet extends HttpServlet {
 		final String TPTFILE_PATTERN = "(.*[/|\\\\])?([^/|\\\\]+)(\\.)(html|htm|js)";//separates file name from directories and extension
 		Map<String, String> templateFiles = new FileScanner("templates", filename -> filename.endsWith(".html") || filename.endsWith(".htm") || filename.endsWith(".js")).
 				scan("templates").
-				collect(toMap(t -> t.path.replaceAll(TPTFILE_PATTERN, "$2$3$4"), t -> t.content));//map key is without folder name
+				collect(toMap(t -> t.path.replaceAll(TPTFILE_PATTERN, "$2$3$4"), t -> t.content));//drop folder name from key
 		localetemplateFiles = localeLabels.entrySet().stream().
 				collect(toMap(locale -> locale.getKey(), locale -> resolvedTemplates(locale.getValue(), templateFiles)));
 	}
@@ -64,7 +78,11 @@ public class ViewServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String templateName = req.getPathInfo();
-		String template = localetemplateFiles.get("en").get(templateName == null || templateName.length() == 1 ? null : templateName.substring(1));
+		String lang = new ViewHtAccessor().init(req).getLanguage();
+		Map<String, String> localeTemplates = Optional.ofNullable(localetemplateFiles.get(lang)).
+				orElseGet(() -> Optional.ofNullable(localetemplateFiles.get("en")).
+				orElseGet(() -> localetemplateFiles.values().iterator().next()));
+		String template = localeTemplates.get(templateName == null || templateName.length() == 1 ? null : templateName.substring(1));
 		resp.getWriter().print(template);
 	}
 }
