@@ -14,14 +14,14 @@ public class TestPush extends BaseTest {
 	}
 
 	@Test
-	public void testMessage() throws Exception {
-		assertArrayEquals(new int[] {3, 5}, new Gson().fromJson(getWebsocketClientResponse("/component-push"), int[].class));
+	public void testMessageAndParameters() throws Exception {
+		assertEquals("xx-yyy", new Gson().fromJson(getWebsocketClientResponse("/component-push?a=xx&b=yyy"), String.class));
 	}
 
 	@Test
 	public void testSessionExists() throws Exception {
 		post("/session", "");
-		assertArrayEquals(new int[] {1, 11}, new Gson().fromJson(getWebsocketClientResponse("/component-push-requires-session"), int[].class));
+		assertArrayEquals(new int[] {3, 5}, new Gson().fromJson(getWebsocketClientResponse("/component-push-requires-session?a=xx"), int[].class));
 	}
 
 	@Test

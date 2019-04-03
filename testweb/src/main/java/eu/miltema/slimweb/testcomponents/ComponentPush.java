@@ -1,9 +1,9 @@
 package eu.miltema.slimweb.testcomponents;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-import eu.miltema.slimweb.annot.Component;
-import eu.miltema.slimweb.annot.SessionNotRequired;
+import eu.miltema.slimweb.annot.*;
 import eu.miltema.slimweb.push.*;
 
 /**
@@ -14,13 +14,13 @@ import eu.miltema.slimweb.push.*;
 @SessionNotRequired
 public class ComponentPush implements ServerPush {
 	@Override
-	public void pushStarted(PushHandle pushHandle, Map<String, List<String>> parameters) throws Exception {
+	public void pushStarted(PushHandle pushHandle, Map<String, String> parameters) throws Exception {
 		new Thread(() -> {
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
 			}
-			pushHandle.pushObject(new int[] {3, 5});
+			pushHandle.pushObject(parameters.values().stream().sorted().collect(Collectors.joining("-")));
 		}).start();
 	}
 

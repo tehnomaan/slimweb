@@ -1,11 +1,12 @@
 package eu.miltema.slimweb.push;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import static java.util.stream.Collectors.*;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.*;
+
 import org.slf4j.*;
 
 import eu.miltema.slimweb.*;
@@ -14,7 +15,7 @@ import eu.miltema.slimweb.annot.SessionNotRequired;
 //Vt kuidas saab kätte http sessiooni
 //1) http://stackoverflow.com/questions/21888425/accessing-servletcontext-and-httpsession-in-onmessage-of-a-jsr-356-serverendpo
 //2) http://stackoverflow.com/questions/17936440/accessing-httpsession-from-httpservletrequest-in-a-web-socket-serverendpoint
-@ServerEndpoint(value = "/push/{component}", configurator = WebsocketConfigurator.class)
+@ServerEndpoint(value = "/push/{__component}", configurator = WebsocketConfigurator.class)
 public class ServerPushEndpoint {
 
 	private static final Logger log = LoggerFactory.getLogger(ServerPushEndpoint.class);
@@ -23,13 +24,14 @@ public class ServerPushEndpoint {
 
 	@OnOpen
 	@SuppressWarnings("unchecked")
-	public void onOpen(final Session session, @PathParam("component") String componentName, EndpointConfig config) {
+	public void onOpen(final Session session, @PathParam("__component") String componentName, EndpointConfig config) {
 		try {
 			if (mapComponents == null)
-				mapComponents = new ComponentsReader().getComponentsAsStream().collect(Collectors.toMap(c -> SlimwebUtil.hyphenate(c.getSimpleName()), c -> c));
+				mapComponents = new ComponentsReader().getComponentsAsStream().collect(toMap(c -> SlimwebUtil.hyphenate(c.getSimpleName()), c -> c));
 			Map<String, Object> uprops = session.getUserProperties();
 			HttpSession httpSession = (HttpSession) uprops.get(PushConst.PROPERTY_HTTP_SESSION);
-			Map<String, List<String>> params = (Map<String, List<String>>) uprops.get(PushConst.PROPERTY_PARAMETERS);
+			Map<String, List<String>> originalParams = (Map<String, List<String>>) uprops.get(PushConst.PROPERTY_PARAMETERS);
+			Map<String, String> params = originalParams.entrySet().stream().filter(e -> !e.getKey().startsWith("__")).collect(toMap(e -> e.getKey(), e -> e.getValue().stream().collect(joining(","))));
 			PushHandleImpl ph = new PushHandleImpl(httpSession, session);
 			ph.componentName = componentName;
 			ph.componentClass = (Class<? extends ServerPush>) Optional.ofNullable(mapComponents.get(componentName)).orElseThrow(() -> new Exception("Cannot map " + componentName + " to any @Component"));

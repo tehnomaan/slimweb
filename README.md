@@ -201,7 +201,7 @@ For example, here is a component that pushes a message with 2sec delay to a clie
 @Component
 public class MyComponent implements ServerPush {
 	@Override
-	public void pushStarted(PushHandle pushHandle, Map<String, List<String>> parameters) throws Exception {
+	public void pushStarted(PushHandle pushHandle, Map<String, String> urlParameters) throws Exception {
 		new Thread(() -> {
 			try {
 				Thread.sleep(2000);

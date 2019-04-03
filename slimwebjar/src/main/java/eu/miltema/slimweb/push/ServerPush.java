@@ -10,10 +10,10 @@ public interface ServerPush {
 	/**
 	 * Called when client has started a push/websocket connection
 	 * @param pushHandle push handle
-	 * @param parameters parameters from client
+	 * @param parameters parameters from URL
 	 * @throws Exception when anything goes wrong in component
 	 */
-	void pushStarted(PushHandle pushHandle, Map<String, List<String>> parameters) throws Exception;
+	void pushStarted(PushHandle pushHandle, Map<String, String> parameters) throws Exception;
 
 	/**
 	 * Called when client has terminated push/websocket connection
