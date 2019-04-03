@@ -8,8 +8,6 @@ public class TestLanguage extends BaseTest {
 
 	@Before
 	public void setup() throws Exception {
-		baseUrl = baseUrl.replace("view", "controller");
-		delete("/session");
 		baseUrl = baseUrl.replace("controller", "view");
 	}
 

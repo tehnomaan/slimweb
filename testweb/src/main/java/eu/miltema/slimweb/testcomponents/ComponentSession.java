@@ -8,7 +8,7 @@ import eu.miltema.slimweb.controller.HttpAccessor;
 public class ComponentSession {
 
 	public void post(HttpAccessor ht) {
-		ht.setSessionObject(new Object());
+		ht.setSessionObject("custom session object");
 	}
 
 	public void delete(HttpAccessor ht) {

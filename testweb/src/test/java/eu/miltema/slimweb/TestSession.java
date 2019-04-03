@@ -19,7 +19,7 @@ public class TestSession extends BaseTest {
 	}
 
 	@Test
-	public void testRequiresSession() throws Exception {
+	public void testRequiresSessionButSessionMissing() throws Exception {
 		try {
 			get("/c2/with-session");
 		}
@@ -27,6 +27,12 @@ public class TestSession extends BaseTest {
 			assertEquals("Http status code 303", ioe.getMessage());
 			assertEquals("../../view/login", headers.firstValue("Location").get());
 		}
+	}
+
+	@Test
+	public void testRequiresSession() throws Exception {
+		post("/session", "");
+		assertEquals("\"custom session object\"", get("/c2/with-session"));
 	}
 
 	@Test

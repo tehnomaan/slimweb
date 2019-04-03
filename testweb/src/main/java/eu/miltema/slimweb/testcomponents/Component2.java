@@ -1,6 +1,7 @@
 package eu.miltema.slimweb.testcomponents;
 
 import eu.miltema.slimweb.annot.*;
+import eu.miltema.slimweb.controller.HttpAccessor;
 
 @Component(urlName = "c2")
 public class Component2 {
@@ -15,7 +16,7 @@ public class Component2 {
 		return "nono";
 	}
 
-	public String getWithSession() {
-		return "mmm";
+	public Object getWithSession(HttpAccessor ht) {
+		return ht.getSessionObject();
 	}
 }
