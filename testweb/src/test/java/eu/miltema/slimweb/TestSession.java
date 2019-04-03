@@ -1,7 +1,9 @@
 package eu.miltema.slimweb;
 
 import static org.junit.Assert.*;
+
 import java.io.IOException;
+
 import org.junit.Test;
 
 public class TestSession extends BaseTest {
@@ -20,12 +22,17 @@ public class TestSession extends BaseTest {
 	public void testRequiresSession() throws Exception {
 		try {
 			get("/c2/with-session");
-			assertFalse("IOException with redirect should have occured", true);
 		}
 		catch(IOException ioe) {
 			assertEquals("Http status code 303", ioe.getMessage());
-			assertEquals("login.html", headers.firstValue("Location").get());
+			assertEquals("../../view/login", headers.firstValue("Location").get());
 		}
 	}
 
+	@Test
+	public void testRequiresSessionJsonResult() throws Exception {
+		get("/c2/with-session", "Content-Type: application/json");
+		assertEquals(250, statusCode);
+		assertEquals("../../view/login", headers.firstValue("Location").get());
+	}
 }

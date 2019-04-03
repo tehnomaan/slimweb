@@ -168,11 +168,12 @@ Some components (like the login page itself) do not require session existence. T
 
 ## Redirecting
 
-Especially after PUT and POST, there is often a need to redirect (to a list). The component redirects to another "target" component.
-However, Slimweb redirects that request to a view instead - a view, which is associated with the target component.
+Especially after PUT and POST, there is often a need to redirect to another view. In a component, use Redirect exception to do that.
+Slimweb sends a HTTP redirect (303) as a response. However, if client is accepting content-type application/json, Slimweb responds with HTTP 250.
+This is because application/json ajax requests are unable to catch 303 response.
 
 ```java
 	public void post() {
-		throw new Redirect(MyListComponent.class);
+		throw new Redirect("login.html");
 	}
 ```

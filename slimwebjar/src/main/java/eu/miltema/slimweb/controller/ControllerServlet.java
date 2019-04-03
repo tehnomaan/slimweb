@@ -95,15 +95,7 @@ public class ControllerServlet extends HttpServlet {
 					htAccessor.response.getWriter().write(gson.toJson(returnValue));
 			}
 			catch(Redirect redirect) {
-				String targetPath = redirect.pathToView;
-				if (targetPath == null) {
-					ComponentDef cdef = mapComponentClasses.get(redirect.targetComponent);
-					if (cdef == null)
-						throw new HttpException(500, "Redirecting to non-@Component " + redirect.targetComponent.getName() + " is not allowed");
-					targetPath = "/view/" + cdef.url;
-				}
-				htAccessor.response.setHeader("Location", targetPath);
-				htAccessor.response.setStatus(303);//Cannot use htAccessor.response.sendRedirect here: it would return status code 302, which is inaccurate
+				redirect(htAccessor, redirect);
 			}
 			catch(HttpException he) {
 				throw he;
@@ -125,5 +117,23 @@ public class ControllerServlet extends HttpServlet {
 			htAccessor.response.setDateHeader("Last-Modified", tm);
 			htAccessor.response.flushBuffer();
 		}
+	}
+
+	private void redirect(HttpAccessor htAccessor, Redirect redirect) throws IOException {
+		String targetPath = redirect.pathToView;
+		if (targetPath == null) {
+			ComponentDef cdef = mapComponentClasses.get(redirect.targetComponent);
+			if (cdef == null)
+				throw new HttpException(500, "Redirecting to non-@Component " + redirect.targetComponent.getName() + " is not allowed");
+			targetPath = "/view/" + cdef.url;
+		}
+		else {
+			if (redirect.pathToView.indexOf('/') < 0)
+				targetPath = (htAccessor.getActionName() == null ? "" : "../") + "../view/" + targetPath.replaceAll("(.+)\\.(html|htm|js)", "$1");
+		}
+		htAccessor.response.getWriter().write("s");
+		htAccessor.response.setHeader("Location", targetPath);
+		boolean acceptsJson = "application/json".equals(htAccessor.request.getContentType());
+		htAccessor.response.setStatus(acceptsJson ? 250 : 303);
 	}
 }
