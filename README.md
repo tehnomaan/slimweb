@@ -1,9 +1,9 @@
 ﻿# Slimweb
-Slimweb is a lightweight Java web application framework for developing a war, based on servlets.
+Slimweb is a lightweight servlet-based Java web application framework.
 
 Why yet another web framework, when we have popular frameworks already?
 Because sometimes, You just don't want the complexity of those popular frameworks.
-Instead, You need basic request handling and a HTML-s,
+Instead, You need basic request handling and HTML-s,
 which would be simple to set up, simple to use, have minimal dependencies and have shallow learning curve.
 For large and complex enterprise projects, Slimweb probably lacks features and flexibility.
 
@@ -23,6 +23,7 @@ Slimweb handles HTML page data mapping and routing to/from components.
 * Locale-specific views: a single template for multiple languages
 * Request logging
 * CSRF detection (soon)
+* Strongly typed session data management
 * Requires Java 11 or later
 
 ## Basic Usage
@@ -76,7 +77,7 @@ Slimweb itself depends on couple of libraries, which are resolved by build syste
 
 ## Components
 
-In previous topic, session injector was defined.
+In "Basic Usage", session argument injector was introduced.
 In fact, it is possible to declare methods with any argument type as long as appropriate injector has been registered with ApplicationInitializer.
 By default, Slimweb supports these method argument types: HttpSession, HttpServletRequest, HttpServletResponse, HttpAccessor
 
@@ -168,9 +169,9 @@ Some components (like the login page itself) do not require session existence. T
 
 ## Redirecting
 
-Especially after PUT and POST, there is often a need to redirect to another view. In a component, use Redirect exception to do that.
-Slimweb sends a HTTP redirect (303) as a response. However, if client is accepting content-type application/json, Slimweb responds with HTTP 250.
-This is because application/json ajax requests are unable to catch 303 response.
+Especially after PUT and POST, there is often need to redirect to another view. In a component, use Redirect exception to do that.
+Slimweb sends an HTTP redirect (303) as a response. However, if client is accepting content-type application/json, Slimweb responds with HTTP 250.
+This is because application/json request initiator is usually browser javascript and it is unable to catch 303 response.
 
 ```java
 	public void post() {
