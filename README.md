@@ -7,12 +7,11 @@ Instead, You need basic request handling and a HTML-s,
 which would be simple to set up, simple to use, have minimal dependencies and have shallow learning curve.
 For large and complex enterprise projects, Slimweb probably lacks features and flexibility.
 
-A Slimweb application consists of 5 kind of artifacts:
+A Slimweb application consists of 4 kinds of artifacts:
 1. Application initializer
-1. [Component service(s) (optional)](#components)
-1. [View template(s) (optional)](#views)
-1. [Label translation files (optional)](#views)
-1. Slimweb library jar
+1. [Component service(s) - (optional)](#components)
+1. [View template(s) - (optional)](#views)
+1. [Label translation files - (optional)](#views)
 
 The main concept is that You have one or several views aka HTML web page(s).
 To provide data and to handle interaction (for example button clicks) with these pages, You provide components with service methods.
@@ -21,13 +20,14 @@ Slimweb handles HTML page data mapping and routing to/from components.
 ## Features
 
 * HTML page data mapping and routing to/from components
-* Locale-specific views
+* Locale-specific views: a single template for multiple languages
 * Request logging
 * CSRF detection (soon)
+* Requires Java 11 or later
 
 ## Basic Usage
 
-The minimum web application consists of 2 Java classes:
+The minimum web application consists of a build script and 2 Java classes:
 * A component
 * An application initializer
 
@@ -43,10 +43,11 @@ public class MyComponent {
 }
 ```
 
-Provide an application initializer, which implements **interface ApplicationInitializer** and has a name **SlimwebInitializer**.
+Provide an application initializer, which implements **interface ApplicationInitializer** and is named **SlimwebInitializer**.
 A name other than SlimwebInitializer is not recognized by Slimweb and initialization would fail.
 
 ```java
+package mypackage.components;
 public class SlimwebInitializer implements ApplicationInitializer {
 	@Override
 	public String[] getComponentPackages() {
@@ -58,17 +59,18 @@ public class SlimwebInitializer implements ApplicationInitializer {
 }
 ```
 
-No other files are needed. Now, compile it into a war and You are ready to go!
-
 ## Dependencies
 
 Add Slimweb dependency into build.gradle:
 
 ```gradle
+apply plugin: 'war'
 dependencies {
     implementation 'eu.miltema:slimweb:0.1.0'
 }
 ```
+
+These 3 files are all You need (SlimwebInitializer.java, MyComponent.java, build.gradle). Now, build the war and You are ready to go!
 
 Slimweb itself depends on couple of libraries, which are resolved by build system automatically.
 
@@ -93,7 +95,7 @@ In component, methods have special naming convention. Below is a table with some
 A view is an HTML web page. These can be defined in project's _src/main/webapp_ folder as usual. Web server will serve such pages itself and Slimweb is unaware of these.
 
 However, sometimes You need locale-specific views (English, Spanish, German) and You want to avoid the translation hassle in front-end technologies like Angular, React or Vue.
-Then You place HTML and JS templates into project's _src/main/resources/templates_ folder. Valid extensions are .html, .htm and .js.
+Then You place HTML and JS templates into project's _src/main/resources/templates_ folder, to become accessible to Slimweb template engine. Valid extensions are .html, .htm and .js.
 Translation files go into project's _src/main/resources/labels_ folder.
 There is a separate label file for each locale, for example _en.lbl_, _de.lbl_ and _es.lbl_ (notice the .lbl extension). 
 
