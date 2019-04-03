@@ -19,4 +19,7 @@ public class Component2 {
 	public Object getWithSession(HttpAccessor ht) {
 		return ht.getSessionObject();
 	}
+
+	public void postSomething() {
+	}
 }

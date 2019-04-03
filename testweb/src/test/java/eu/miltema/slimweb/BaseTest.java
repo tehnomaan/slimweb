@@ -15,6 +15,7 @@ abstract class BaseTest {
 	protected HttpHeaders headers;
 	protected int statusCode;
 	protected String baseUrl = "http://localhost:8080/testweb/controller/";
+	protected String referer = "https://www.miltema.eu";
 
 	public BaseTest() {
 		CookieHandler.setDefault(new CookieManager());
@@ -23,10 +24,11 @@ abstract class BaseTest {
 
 	protected String sendRequest(String componentPath, Function<Builder, Builder> methodBuilder, String ... headerKeyValues) throws IOException, InterruptedException {
 		String uri = baseUrl + (componentPath.startsWith("/") ? componentPath.substring(1) : componentPath);
-		Builder builder = HttpRequest.newBuilder().uri(URI.create(uri));
+		Builder builder = HttpRequest.newBuilder(URI.create(uri));
 		if (headerKeyValues != null)
 			for(int i = 0; i < headerKeyValues.length; i++)
 				builder.header(headerKeyValues[i].split(":")[0], headerKeyValues[i].split(":")[1]);
+
 		HttpRequest request = methodBuilder.apply(builder).build();
 		HttpResponse<String> httpResponse = httpClient.send(request, BodyHandlers.ofString());
 		headers = httpResponse.headers();

@@ -1,11 +1,16 @@
 package eu.miltema.slimweb.controller;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.*;
+
+import org.slf4j.*;
 
 abstract public class HttpAccessor {
 
 	private static final String SESSION_OBJECT = "__SESSION_OBJECT";
 	private static final String SESSION_LANGUAGE = "__SESSION_LANGUAGE";
+
+	private static final Logger log = LoggerFactory.getLogger(HttpAccessor.class);
 
 	public HttpServletRequest request;
 	public HttpServletResponse response;
@@ -102,6 +107,32 @@ abstract public class HttpAccessor {
 		if (session == null)
 			throw new IllegalStateException("Missing session");
 		session.setAttribute(SESSION_LANGUAGE, language);
+	}
+
+	/**
+	 * CSRF check is only necessary for POST, PUT, DELETE requests with ongoing session, because only these can modify data before user can see it
+	 */
+	public HttpAccessor detectCsrf(String[] validOriginPrefixes) throws ServletException {
+		if (request.getSession(false) == null || validOriginPrefixes == null)
+			return this;
+
+		String origin = request.getHeader("Origin");
+		String referer = request.getHeader("Referer");
+		boolean accepted = false;
+		for(String mandatoryOriginPrefix : validOriginPrefixes) {
+
+			if (referer != null && origin != null)
+				accepted = mandatoryOriginPrefix.equals(origin) && referer.startsWith(mandatoryOriginPrefix);
+			else if (origin != null)
+				accepted = mandatoryOriginPrefix.equals(origin);
+			else if (referer != null)
+				accepted = referer.startsWith(mandatoryOriginPrefix);
+
+			if (accepted)
+				return this;
+		}
+		log.warn("CSRF detected, details: origin="+origin+", referer="+referer+", remoteIp="+request.getRemoteAddr());
+		throw new ServletException("CSRF attack detected");
 	}
 
 	abstract public String getParametersAsJson();

@@ -18,6 +18,7 @@ public class ControllerServlet extends HttpServlet {
 	private Map<Class<?>, ComponentDef> mapComponentClasses = new HashMap<Class<?>, ComponentDef>();//class->component
 	private Map<Class<?>, ArgumentInjector> mapInjectors = new HashMap<>();
 	private ApplicationInitializer initializer;
+	private String[] validOrigins;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -37,6 +38,7 @@ public class ControllerServlet extends HttpServlet {
 			mapInjectors.put(HttpSession.class, a -> a.request.getSession(false));
 			initializer = cr.getInitializer();
 			initializer.registerInjectors(mapInjectors);
+			validOrigins = initializer.getValidOrigins();
 			mapComponents.values().forEach(cdef -> cdef.methods.values().forEach(mdef -> mdef.init(mapInjectors)));
 		} catch (Exception e) {
 			log.error("", e);
@@ -51,17 +53,17 @@ public class ControllerServlet extends HttpServlet {
 
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		serviceRequest(new HttpGetAccessor().init(req, resp, "delete"));
+		serviceRequest(new HttpGetAccessor().init(req, resp, "delete").detectCsrf(validOrigins));
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		serviceRequest(new HttpPostAccessor().init(req, resp, "post"));
+		serviceRequest(new HttpPostAccessor().init(req, resp, "post").detectCsrf(validOrigins));
 	}
 
 	@Override
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		serviceRequest(new HttpPostAccessor().init(req, resp, "put"));
+		serviceRequest(new HttpPostAccessor().init(req, resp, "put").detectCsrf(validOrigins));
 	}
 
 	private void serviceRequest(HttpAccessor htAccessor) throws IOException {

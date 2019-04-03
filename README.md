@@ -22,7 +22,7 @@ Slimweb handles HTML page data mapping and routing to/from components.
 * HTML page data mapping and routing to/from components
 * Locale-specific views: a single template for multiple languages
 * Request logging
-* CSRF detection (soon)
+* CSRF attack detection
 * Strongly typed session data management
 * Requires Java 11 or later
 
@@ -52,10 +52,22 @@ package mypackage.components;
 public class SlimwebInitializer implements ApplicationInitializer {
 	@Override
 	public String[] getComponentPackages() {
-		return new String[] {"mypackage.components"};//Slimweb will only scan components in this Java package and its subpackages
+		//Slimweb will only scan components in this Java package and its subpackages
+		return new String[] {"com.mypackage.components"};
 	}
+
 	@Override
-	public void registerInjectors(Map<Class<?>, ArgumentInjector> mapInjectors) {//ignore it's purpose for now
+	public void registerInjectors(Map<Class<?>, ArgumentInjector> mapInjectors) {
+	}
+
+	@Override
+	public String getLoginView() {
+		return "login.html";
+	}
+
+	@Override
+	public String[] getValidOrigins() {
+		return new String[] {"https://mydomain.com"};
 	}
 }
 ```

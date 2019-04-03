@@ -23,4 +23,9 @@ public class SlimwebInitializer implements ApplicationInitializer {
 		return "login.html";
 	}
 
+	@Override
+	public String[] getValidOrigins() {
+		return null;
+	}
+
 }

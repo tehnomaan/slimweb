@@ -19,4 +19,11 @@ public interface ApplicationInitializer {
 	 * @return path to view, which requires user login
 	 */
 	String getLoginView();
+
+	/**
+	 * Provides a list of valid origins for CSRF attack detection.
+	 * When null is returned, all origins are valid and CSRF attack is possible 
+	 * @return a list of valid origins, for example ["http://myhost.com", "https://myhost.com"]; these origins are used in CSRF attack detection algorithm
+	 */
+	String[] getValidOrigins();
 }
