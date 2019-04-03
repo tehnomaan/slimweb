@@ -55,7 +55,7 @@ abstract class BaseTest {
 		return sendRequest(componentPath, b -> b.PUT(BodyPublishers.ofString(json)));
 	}
 
-	protected String getWebsocketClientResponse() throws InterruptedException {
+	protected String getWebsocketClientResponse(String componentUrl) throws InterruptedException {
 		StringBuilder response = new StringBuilder();
 		Listener listener = new Listener() {
 			@Override
@@ -72,11 +72,14 @@ abstract class BaseTest {
 			}
 			@Override
 			public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
+				synchronized (baseUrl) {
+					baseUrl.notify();
+				}
 				return Listener.super.onClose(webSocket, statusCode, reason);
 			}
 		};
 		baseUrl = baseUrl.replaceAll("controller", "push").replace("http", "ws");
-		WebSocket ws = httpClient.newWebSocketBuilder().buildAsync(URI.create(baseUrl + "/component-push"), listener).join();
+		WebSocket ws = httpClient.newWebSocketBuilder().buildAsync(URI.create(baseUrl + componentUrl), listener).join();
 		ws.sendText("zzz", true);
 		synchronized (baseUrl) {
 			baseUrl.wait(2000);

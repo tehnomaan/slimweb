@@ -8,8 +8,8 @@ import javax.websocket.*;
 import javax.websocket.server.*;
 import org.slf4j.*;
 
-import eu.miltema.slimweb.ComponentsReader;
-import eu.miltema.slimweb.SlimwebUtil;
+import eu.miltema.slimweb.*;
+import eu.miltema.slimweb.annot.SessionNotRequired;
 
 //Vt kuidas saab kätte http sessiooni
 //1) http://stackoverflow.com/questions/21888425/accessing-servletcontext-and-httpsession-in-onmessage-of-a-jsr-356-serverendpo
@@ -33,6 +33,10 @@ public class ServerPushEndpoint {
 			PushHandleImpl ph = new PushHandleImpl(httpSession, session);
 			ph.componentName = componentName;
 			ph.componentClass = (Class<? extends ServerPush>) Optional.ofNullable(mapComponents.get(componentName)).orElseThrow(() -> new Exception("Cannot map " + componentName + " to any @Component"));
+			if (httpSession == null && !ph.componentClass.isAnnotationPresent(SessionNotRequired.class)) {
+				session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Missing session"));
+				return;
+			}
 			uprops.put(PushConst.PROPERTY_HANDLE, ph);
 			ServerPush component = ph.componentClass.getConstructor().newInstance();
 			log.info("Request /push/" + componentName);
@@ -57,6 +61,8 @@ public class ServerPushEndpoint {
 	public void onClose(Session session, CloseReason closeReason) {
 		try {
 			PushHandleImpl ph = (PushHandleImpl) session.getUserProperties().get(PushConst.PROPERTY_HANDLE);
+			if (ph == null)
+				return;
 			log.info("Terminating /push/" + ph.componentName);
 			if (ph.componentName != null) {
 				Class<?> componentClass = mapComponents.get(ph.componentName);

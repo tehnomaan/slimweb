@@ -24,6 +24,7 @@ Slimweb handles HTML page data mapping and routing to/from components.
 * Request logging
 * CSRF attack detection
 * Strongly typed session data management
+* Server push via websocket
 * Requires Java 11 or later
 
 ## Basic Usage
@@ -190,3 +191,30 @@ This is because application/json request initiator is usually browser javascript
 		throw new Redirect("login.html");
 	}
 ```
+
+## Server Push
+
+Any component can be made to support server push, when it implements __ServerPush__ interface.
+For example, here is a component that pushes a message with 2sec delay to a client, which makes a websocket connection to ws://myhost.com/push/my-component:
+
+```java
+@Component
+public class MyComponent implements ServerPush {
+	@Override
+	public void pushStarted(PushHandle pushHandle, Map<String, List<String>> parameters) throws Exception {
+		new Thread(() -> {
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+			}
+			pushHandle.pushObject(new int[] {3, 5});
+		}).start();
+	}
+
+	@Override
+	public void pushTerminated(PushHandle pushHandle) throws Exception {
+	}
+}
+```
+
+By default, a component requires session existence or it won't accept websocket connection. Annotation @SessionNotRequired can be used to suppress session equirement.

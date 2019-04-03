@@ -15,10 +15,17 @@ public class TestPush extends BaseTest {
 
 	@Test
 	public void testMessage() throws Exception {
-		assertArrayEquals(new int[] {3, 5}, new Gson().fromJson(getWebsocketClientResponse(), int[].class));
+		assertArrayEquals(new int[] {3, 5}, new Gson().fromJson(getWebsocketClientResponse("/component-push"), int[].class));
 	}
 
 	@Test
-	public void testInvalidComponent() {
+	public void testSessionExists() throws Exception {
+		post("/session", "");
+		assertArrayEquals(new int[] {1, 11}, new Gson().fromJson(getWebsocketClientResponse("/component-push-requires-session"), int[].class));
+	}
+
+	@Test
+	public void testMissingSession() throws Exception {
+		assertEquals("", getWebsocketClientResponse("/component-push-requires-session"));
 	}
 }
