@@ -1,4 +1,4 @@
-package eu.miltema.slimweb;
+package eu.miltema.slimweb.common;
 
 public class SlimwebUtil {
 	public static String hyphenate(String s) {

@@ -1,4 +1,4 @@
-package eu.miltema.slimweb.controller;
+package eu.miltema.slimweb;
 
 import java.text.MessageFormat;
 

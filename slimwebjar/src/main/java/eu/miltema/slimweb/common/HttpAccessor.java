@@ -1,9 +1,9 @@
-package eu.miltema.slimweb.controller;
+package eu.miltema.slimweb.common;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
-
 import org.slf4j.*;
+import eu.miltema.slimweb.HttpException;
 
 abstract public class HttpAccessor {
 

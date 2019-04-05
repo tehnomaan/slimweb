@@ -7,6 +7,7 @@ import java.util.Map;
 import eu.miltema.slimweb.ApplicationInitializer;
 import eu.miltema.slimweb.ArgumentInjector;
 import eu.miltema.slimweb.annot.SessionNotRequired;
+import eu.miltema.slimweb.common.HttpAccessor;
 
 class MethodDef {
 	public Method method;

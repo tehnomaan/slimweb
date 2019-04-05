@@ -2,9 +2,8 @@ package eu.miltema.slimweb.testcomponents;
 
 import java.util.Map;
 
-import eu.miltema.slimweb.ApplicationInitializer;
-import eu.miltema.slimweb.ArgumentInjector;
-import eu.miltema.slimweb.controller.HttpAccessor;
+import eu.miltema.slimweb.*;
+import eu.miltema.slimweb.common.HttpAccessor;
 
 public class SlimwebInitializer implements ApplicationInitializer {
 

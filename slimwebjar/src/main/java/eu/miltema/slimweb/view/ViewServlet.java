@@ -9,7 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import org.slf4j.*;
 import eu.miltema.cpscan.FileScanner;
-import eu.miltema.slimweb.controller.HttpAccessor;
+import eu.miltema.slimweb.common.HttpAccessor;
 
 @WebServlet(urlPatterns={"/view/*"})
 public class ViewServlet extends HttpServlet {

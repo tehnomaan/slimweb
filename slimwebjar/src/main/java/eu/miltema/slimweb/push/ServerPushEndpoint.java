@@ -2,15 +2,13 @@ package eu.miltema.slimweb.push;
 
 import java.util.*;
 import static java.util.stream.Collectors.*;
-
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.*;
-
 import org.slf4j.*;
-
 import eu.miltema.slimweb.*;
 import eu.miltema.slimweb.annot.SessionNotRequired;
+import eu.miltema.slimweb.common.SlimwebUtil;
 
 //Vt kuidas saab kätte http sessiooni
 //1) http://stackoverflow.com/questions/21888425/accessing-servletcontext-and-httpsession-in-onmessage-of-a-jsr-356-serverendpo

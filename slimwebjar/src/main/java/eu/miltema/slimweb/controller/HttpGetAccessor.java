@@ -6,6 +6,8 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 
+import eu.miltema.slimweb.common.HttpAccessor;
+
 class HttpGetAccessor extends HttpAccessor {
 
 	@Override

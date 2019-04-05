@@ -1,7 +1,7 @@
 package eu.miltema.slimweb.testcomponents;
 
 import eu.miltema.slimweb.annot.*;
-import eu.miltema.slimweb.controller.HttpAccessor;
+import eu.miltema.slimweb.common.HttpAccessor;
 
 @Component(urlName = "session")
 @SessionNotRequired

@@ -3,9 +3,9 @@ package eu.miltema.slimweb.controller;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import eu.miltema.slimweb.SlimwebUtil;
 import eu.miltema.slimweb.annot.Component;
 import eu.miltema.slimweb.annot.SessionNotRequired;
+import eu.miltema.slimweb.common.SlimwebUtil;
 
 class ComponentDef {
 	Class<?> clazz;

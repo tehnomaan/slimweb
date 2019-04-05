@@ -9,6 +9,7 @@ import javax.servlet.http.*;
 import org.slf4j.*;
 import com.google.gson.Gson;
 import eu.miltema.slimweb.*;
+import eu.miltema.slimweb.common.HttpAccessor;
 
 @WebServlet(urlPatterns={"/controller/*"})
 public class ControllerServlet extends HttpServlet {
