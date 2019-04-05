@@ -5,22 +5,27 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import eu.miltema.cpscan.*;
 import eu.miltema.slimweb.annot.Component;
-import eu.miltema.slimweb.rcscanner.*;
 
 public class ComponentsReader {
 	private static Collection<Class<?>> cachedComponents;
-	private Consumer<String> logger = s -> {};
+	private Consumer<String> logger;
 	private ApplicationInitializer initializer;
 
 	private class InitializerFoundException extends RuntimeException {
+	}
+
+	public ComponentsReader(Consumer<String> logger) {
+		this.logger = logger;
 	}
 
 	public Stream<Class<?>> getComponentsAsStream() throws Exception {
 		if (cachedComponents != null)
 			return cachedComponents.stream();
 		try {
-			new ClassScanner("SlimwebInitializer") {
+			logger.accept("Looking for SlimwebInitializer");
+			new ClassScanner(logger) {
 				@Override
 				protected Class<?> entryFound(String relativePath, FileContentSupplier fileContentSupplier) {
 					if (!relativePath.endsWith("SlimwebInitializer.class"))
@@ -33,21 +38,16 @@ public class ComponentsReader {
 						throw new RuntimeException("Unable to instantiate initializer class " + initializerClass.getName() + ", which must implement interface ApplicationInitializer", e);
 					}
 				}
-			}.setLogger(logger).scan();
+			}.scan();
 			throw new Exception("Could not find class SlimwebInitializer; unable to initialize Slimweb");
 		}
 		catch(InitializerFoundException ife) {}//initializer was found, let's continue
 		cachedComponents = new ArrayList<>();
-		return new ClassScanner("@Component classes").
-				setLogger(logger).
+		logger.accept("Looking for @Component classes");
+		return new ClassScanner(logger).
 				scan(initializer.getComponentPackages()).
 				filter(c -> c.isAnnotationPresent(Component.class)).
 				peek(c -> cachedComponents.add(c));
-	}
-
-	public ComponentsReader setLogger(Consumer<String> logger) {
-		this.logger = logger;
-		return this;
 	}
 
 	public ApplicationInitializer getInitializer() {

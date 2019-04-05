@@ -1,20 +1,15 @@
 package eu.miltema.slimweb.view;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
-
+import java.util.*;
 import static java.util.function.Predicate.*;
-
 import static java.util.stream.Collectors.*;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import org.slf4j.*;
-
+import eu.miltema.cpscan.FileScanner;
 import eu.miltema.slimweb.controller.HttpAccessor;
-import eu.miltema.slimweb.rcscanner.FileScanner;
 
 @WebServlet(urlPatterns={"/view/*"})
 public class ViewServlet extends HttpServlet {
@@ -47,7 +42,8 @@ public class ViewServlet extends HttpServlet {
 
 	private void initLocaleLabels() throws Exception {
 		final String LBLFILE_PATTERN = "(.*[/|\\\\])?([^/|\\\\]+)(\\.)lbl";//separates file name from directories and extension
-		localeLabels = new FileScanner("label files", filename -> filename.endsWith(".lbl")).
+		log.info("Looking for label files");
+		localeLabels = new FileScanner(s -> log.info(s), filename -> filename.endsWith(".lbl")).
 				scan("labels").
 				collect(toMap(t -> t.path.replaceAll(LBLFILE_PATTERN, "$2"), t -> getLabelsMap(t.content)));
 	}
@@ -61,7 +57,8 @@ public class ViewServlet extends HttpServlet {
 
 	private void initLocaleTemplateFiles() throws Exception {
 		final String TPTFILE_PATTERN = "(.*[/|\\\\])?([^/|\\\\]+)(\\.)(html|htm|js)";//separates file name from directories and extension
-		Map<String, String> templateFiles = new FileScanner("templates", filename -> filename.endsWith(".html") || filename.endsWith(".htm") || filename.endsWith(".js")).
+		log.info("Looking for template files");
+		Map<String, String> templateFiles = new FileScanner(s -> log.info(s), filename -> filename.endsWith(".html") || filename.endsWith(".htm") || filename.endsWith(".js")).
 				scan("templates").
 				collect(toMap(t -> t.path.replaceAll(TPTFILE_PATTERN, "$2$3$4"), t -> t.content));//drop folder name from key
 		localetemplateFiles = localeLabels.entrySet().stream().

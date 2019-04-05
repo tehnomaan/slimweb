@@ -23,9 +23,8 @@ public class ControllerServlet extends HttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
-			ComponentsReader cr = new ComponentsReader();
-			mapComponents = cr.setLogger(s -> log.info(s)).
-					getComponentsAsStream().
+			ComponentsReader cr = new ComponentsReader(s -> log.debug(s));
+			mapComponents = cr.getComponentsAsStream().
 					map(c -> new ComponentDef(c)).
 					peek(c -> mapComponentClasses.put(c.clazz, c)).
 					collect(toMap(c -> c.url, c -> c));
