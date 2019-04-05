@@ -111,6 +111,9 @@ abstract public class HttpAccessor {
 
 	/**
 	 * CSRF check is only necessary for POST, PUT, DELETE requests with ongoing session, because only these can modify data before user can see it
+	 * @param validOriginPrefixes list of accepted origins, for example {"http://mysite.com", "https://mysite.com"}
+	 * @return the same HttpAccessor object
+	 * @throws ServletException when CSRF attack was detected
 	 */
 	public HttpAccessor detectCsrf(String[] validOriginPrefixes) throws ServletException {
 		if (request.getSession(false) == null || validOriginPrefixes == null)
