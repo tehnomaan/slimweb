@@ -68,8 +68,8 @@ public class ViewServlet extends HttpServlet {
 	private Map<String, String> resolvedTemplates(Map<String, String> labels, Map<String, String> templateFiles) {
 		final String TPTFILE_PATTERN = "(.+)(\\.)(html|htm|js)";//separates file name from directories and extension
 		TemplateResolver resolver = new TemplateResolver();
-		resolver.customReplacer("file:", filename -> resolver.replace(templateFiles.getOrDefault(filename, "!!!file:" + filename + "!!!"), labels));//use this same resolver to resolve {-file:xyzfilename-} elements
-		return templateFiles.entrySet().stream().collect(toMap(e -> e.getKey().replaceAll(TPTFILE_PATTERN, "$1"), e -> resolver.replace(e.getValue(), labels)));//key: name without extension
+		resolver.customReplacer("file:", filename -> resolver.replace(templateFiles.getOrDefault(filename, "!!!file:" + filename + "!!!"), labels, filename));//use this same resolver to resolve {-file:xyzfilename-} elements
+		return templateFiles.entrySet().stream().collect(toMap(e -> e.getKey().replaceAll(TPTFILE_PATTERN, "$1"), e -> resolver.replace(e.getValue(), labels, e.getKey())));//key: name without extension
 	}
 
 	@Override

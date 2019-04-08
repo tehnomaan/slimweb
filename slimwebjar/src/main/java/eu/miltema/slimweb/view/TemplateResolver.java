@@ -18,7 +18,7 @@ class TemplateResolver {
 	 * @param replaceValues replace values
 	 * @return template with replacements
 	 */
-	String replace(String template, Map<String, String> replaceValues) {
+	String replace(String template, Map<String, String> replaceValues, String defaultPrefix) {
 		Pattern pattern = Pattern.compile("(\\{-)([^-]+)(-\\})");
 		Matcher m = pattern.matcher(template);
 		int pos = 0;
@@ -27,6 +27,8 @@ class TemplateResolver {
 			if (m.start() > pos)
 				sb.append(template.substring(pos, m.start()));
 			String id = m.group(2);
+			if (id.length() > 0 && id.charAt(0) == '.')
+				id = defaultPrefix + id;
 			String replacement = replaceValues.get(id);
 			if (replacement == null) {
 				String[] idsplit = id.split(":");
