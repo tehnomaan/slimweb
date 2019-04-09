@@ -81,7 +81,7 @@ public class ControllerServlet extends HttpServlet {
 					throw new HttpException(404, "Cannot map /{0} to action", actionName);
 				if (htAccessor.request.getSession(false) == null && cdef.requiresSession && mdef.requiresSession)
 					throw new Redirect(initializer.getLoginView());
-				Gson gson = new Gson();
+				Gson gson = new WebJsonBuilder().build();
 				String json = htAccessor.getParametersAsJson();
 				Object component = gson.fromJson(json, cdef.clazz);
 				if (component == null)

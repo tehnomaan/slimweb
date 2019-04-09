@@ -56,4 +56,17 @@ public class TestBasicComponents extends BaseTest {
 			assertEquals("/view/c2", headers.firstValue("Location").get());
 		}
 	}
+
+	@Test
+	public void testSerializeNulls() throws Exception {
+		String result = get("/component-types");
+		assertTrue(result.contains("\"name\":null"));
+	}
+
+	@Test
+	public void testSerializeDates() throws Exception {
+		String result = get("/component-types?date=2019-01-31&datetime=2019-03-31T23:58:24");
+		assertTrue(result.contains("\"date\":\"2019-02-01\""));
+		assertTrue(result.contains("\"datetime\":\"2019-04-01T00:03:24\""));
+	}
 }
