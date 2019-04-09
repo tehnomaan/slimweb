@@ -5,7 +5,7 @@ import java.util.Map;
 import eu.miltema.slimweb.*;
 import eu.miltema.slimweb.common.HttpAccessor;
 
-public class SlimwebInitializer implements ApplicationInitializer {
+public class SlimwebConfiguration implements ApplicationConfiguration {
 
 	@Override
 	public String[] getComponentPackages() {

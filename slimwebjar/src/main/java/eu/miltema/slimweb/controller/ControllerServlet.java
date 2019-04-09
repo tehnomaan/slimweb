@@ -18,7 +18,7 @@ public class ControllerServlet extends HttpServlet {
 	private Map<String, ComponentDef> mapComponents;//urlName->component
 	private Map<Class<?>, ComponentDef> mapComponentClasses = new HashMap<Class<?>, ComponentDef>();//class->component
 	private Map<Class<?>, ArgumentInjector> mapInjectors = new HashMap<>();
-	private ApplicationInitializer initializer;
+	private ApplicationConfiguration configuration;
 	private String[] validOrigins;
 
 	@Override
@@ -36,9 +36,9 @@ public class ControllerServlet extends HttpServlet {
 			mapInjectors.put(HttpServletRequest.class, a -> a.request);
 			mapInjectors.put(HttpServletResponse.class, a -> a.response);
 			mapInjectors.put(HttpSession.class, a -> a.request.getSession(false));
-			initializer = cr.getInitializer();
-			initializer.registerInjectors(mapInjectors);
-			validOrigins = initializer.getValidOrigins();
+			configuration = cr.getInitializer();
+			configuration.registerInjectors(mapInjectors);
+			validOrigins = configuration.getValidOrigins();
 			mapComponents.values().forEach(cdef -> cdef.methods.values().forEach(mdef -> mdef.init(mapInjectors)));
 		} catch (Exception e) {
 			log.error("", e);
@@ -80,7 +80,7 @@ public class ControllerServlet extends HttpServlet {
 				if (mdef == null)
 					throw new HttpException(404, "Cannot map /{0} to action", actionName);
 				if (htAccessor.request.getSession(false) == null && cdef.requiresSession && mdef.requiresSession)
-					throw new Redirect(initializer.getLoginView());
+					throw new Redirect(configuration.getLoginView());
 				Gson gson = new WebJsonBuilder().build();
 				String json = htAccessor.getParametersAsJson();
 				Object component = gson.fromJson(json, cdef.clazz);

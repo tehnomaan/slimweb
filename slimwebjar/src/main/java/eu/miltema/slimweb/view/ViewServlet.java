@@ -10,7 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import org.slf4j.*;
 import eu.miltema.cpscan.FileScanner;
-import eu.miltema.slimweb.ApplicationInitializer;
+import eu.miltema.slimweb.ApplicationConfiguration;
 import eu.miltema.slimweb.ComponentsReader;
 import eu.miltema.slimweb.HttpException;
 import eu.miltema.slimweb.common.HttpAccessor;
@@ -21,7 +21,7 @@ public class ViewServlet extends HttpServlet {
 	private static final Logger log = LoggerFactory.getLogger(ViewServlet.class);
 	private Map<String, Map<String, String>> localeLabels;
 	private Map<String, Map<String, String>> localetemplateFiles;
-	private ApplicationInitializer initializer;
+	private ApplicationConfiguration configuration;
 
 	private class ViewHtAccessor extends HttpAccessor {
 		@Override
@@ -37,7 +37,7 @@ public class ViewServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		try {
-			initializer = new ComponentsReader(s -> log.debug(s)).getInitializer();
+			configuration = new ComponentsReader(s -> log.debug(s)).getInitializer();
 			initLocaleLabels();
 			initLocaleTemplateFiles();
 		} catch (Exception e) {
@@ -91,7 +91,7 @@ public class ViewServlet extends HttpServlet {
 		try {
 			if (template == null)
 				throw new HttpException(404, "Template " + templateName + " not found");
-			String frameName = initializer.getFrameForTemplate(template, htAccessor);
+			String frameName = configuration.getFrameForTemplate(template, htAccessor);
 			String frame = localeTemplates.get(frameName);
 			if (frame == null)
 				throw new HttpException(404, "Frame template " + frame + " not found");

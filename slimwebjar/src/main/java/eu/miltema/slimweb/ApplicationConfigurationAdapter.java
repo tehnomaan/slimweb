@@ -4,7 +4,7 @@ import java.util.Map;
 
 import eu.miltema.slimweb.common.HttpAccessor;
 
-abstract public class ApplicationInitializerAdapter implements ApplicationInitializer {
+abstract public class ApplicationConfigurationAdapter implements ApplicationConfiguration {
 
 	@Override
 	public void registerInjectors(Map<Class<?>, ArgumentInjector> mapInjectors) {

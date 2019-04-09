@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import eu.miltema.slimweb.ApplicationInitializer;
+import eu.miltema.slimweb.ApplicationConfiguration;
 import eu.miltema.slimweb.ArgumentInjector;
 import eu.miltema.slimweb.annot.SessionNotRequired;
 import eu.miltema.slimweb.common.HttpAccessor;
@@ -25,7 +25,7 @@ class MethodDef {
 		for(int i = 0; i < types.length; i++) {
 			ArgumentInjector injector = mapInjectors.get(types[i]);
 			if (injector == null)
-				throw new IllegalArgumentException("Method " + method.toString() + " declares parameter of type " + types[i].getSimpleName() + ", which was not registered in " + ApplicationInitializer.class.getSimpleName());
+				throw new IllegalArgumentException("Method " + method.toString() + " declares parameter of type " + types[i].getSimpleName() + ", which was not registered in " + ApplicationConfiguration.class.getSimpleName());
 			injectors[i] = injector;
 		}
 	}

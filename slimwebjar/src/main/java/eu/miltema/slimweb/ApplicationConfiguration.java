@@ -4,7 +4,7 @@ import java.util.Map;
 
 import eu.miltema.slimweb.common.HttpAccessor;
 
-public interface ApplicationInitializer {
+public interface ApplicationConfiguration {
 
 	/**
 	 * @return names of root packages, where slimweb components are found. For example return new String[] {"com.mypackage", "com.yourpackage.components"}

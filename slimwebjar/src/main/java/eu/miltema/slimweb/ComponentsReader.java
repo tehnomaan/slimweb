@@ -11,7 +11,7 @@ import eu.miltema.slimweb.annot.Component;
 public class ComponentsReader {
 	private static Collection<Class<?>> cachedComponents;
 	private Consumer<String> logger;
-	private ApplicationInitializer initializer;
+	private ApplicationConfiguration initializer;
 
 	private class InitializerFoundException extends RuntimeException {
 	}
@@ -26,7 +26,7 @@ public class ComponentsReader {
 		return cachedComponents.stream();
 	}
 
-	public ApplicationInitializer getInitializer() throws Exception {
+	public ApplicationConfiguration getInitializer() throws Exception {
 		if (initializer == null)
 			init();
 		return initializer;
@@ -34,22 +34,22 @@ public class ComponentsReader {
 
 	private void init() throws Exception {
 		try {
-			logger.accept("Looking for SlimwebInitializer");
+			logger.accept("Looking for SlimwebConfiguration");
 			new ClassScanner(logger) {
 				@Override
 				protected Class<?> entryFound(String relativePath, FileContentSupplier fileContentSupplier) {
-					if (!relativePath.endsWith("SlimwebInitializer.class"))
+					if (!relativePath.endsWith("SlimwebConfiguration.class"))
 						return null;
 					Class<?> initializerClass = super.entryFound(relativePath, fileContentSupplier);
 					try {
-						initializer = (ApplicationInitializer) initializerClass.getDeclaredConstructor().newInstance();
+						initializer = (ApplicationConfiguration) initializerClass.getDeclaredConstructor().newInstance();
 						throw new InitializerFoundException();
 					} catch (InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
-						throw new RuntimeException("Unable to instantiate initializer class " + initializerClass.getName() + ", which must implement interface ApplicationInitializer", e);
+						throw new RuntimeException("Unable to instantiate initializer class " + initializerClass.getName() + ", which must implement interface ApplicationConfiguration", e);
 					}
 				}
 			}.scan();
-			throw new Exception("Could not find class SlimwebInitializer; unable to initialize Slimweb");
+			throw new Exception("Could not find class SlimwebConfiguration; unable to initialize Slimweb");
 		}
 		catch(InitializerFoundException ife) {}//initializer was found, let's continue
 		cachedComponents = new ArrayList<>();

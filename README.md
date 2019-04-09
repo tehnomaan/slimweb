@@ -8,7 +8,7 @@ which would be simple to set up, simple to use, have minimal dependencies and ha
 For large and complex enterprise projects, Slimweb probably lacks features and flexibility.
 
 A Slimweb application consists of 4 kinds of artifacts:
-1. Application initializer
+1. Application configuration
 1. [Component service(s) - (optional)](#components)
 1. [View template(s) - (optional)](#views)
 1. [Label translation files - (optional)](#views)
@@ -31,7 +31,7 @@ Slimweb handles HTML page data mapping and routing to/from components.
 
 The minimum web application consists of a build script and 2 Java classes:
 * A component
-* An application initializer
+* An application configuration
 
 Provide a component class, which would handle GET requests at _https://<my.host>/controller/my-component_:
 
@@ -45,14 +45,14 @@ public class MyComponent {
 }
 ```
 
-Provide an application initializer, which implements **interface ApplicationInitializer** and is named **SlimwebInitializer**.
-A name other than SlimwebInitializer is not recognized by Slimweb and initialization would fail.
+Provide an application configuration, which implements **interface ApplicationConfiguration** and is named **SlimwebConfiguration**.
+A name other than SlimwebConfiguration is not recognized by Slimweb and initialization would fail.
 
 ```java
 package mypackage.components;
 
-// For convenience, we are using ApplicationInitializerAdapter instead of ApplicationInitializer
-public class SlimwebInitializer extends ApplicationInitializerAdapter {
+// For convenience, we are using ApplicationConfigurationAdapter instead of ApplicationConfiguration
+public class SlimwebConfiguration extends ApplicationConfigurationAdapter {
 	@Override
 	public String[] getComponentPackages() {
 		//Slimweb will only scan components in this Java package and its subpackages
@@ -72,14 +72,14 @@ dependencies {
 }
 ```
 
-These 3 files are all You need (SlimwebInitializer.java, MyComponent.java, build.gradle). Now, build the war and You are ready to go!
+These 3 files are all You need (SlimwebConfiguration.java, MyComponent.java, build.gradle). Now, build the war and You are ready to go!
 
 Slimweb itself depends on couple of libraries, which are resolved by build system automatically.
 
 ## Components
 
 In "Basic Usage", session argument injector was introduced.
-In fact, it is possible to declare methods with any argument type as long as appropriate injector has been registered with ApplicationInitializer.
+In fact, it is possible to declare methods with any argument type as long as appropriate injector has been registered with ApplicationConfiguration.
 By default, Slimweb supports these method argument types: HttpSession, HttpServletRequest, HttpServletResponse, HttpAccessor
 
 In component, methods have special naming convention. Below is a table with some url-to-method mapping examples (in class MyComponent):
@@ -120,10 +120,10 @@ frontpage.hellotext=Hello, world!
 ```
 
 Usually, views share a common frame (perhaps with header, footer and other components).
-The frame inclusion logic is declared in SlimwebInitializer and the frame itself in templates-folder:
+The frame inclusion logic is declared in SlimwebConfiguration and the frame itself in templates-folder:
 
 ```java
-public class SlimwebInitializer extends ApplicationInitializerAdapter {
+public class SlimwebConfiguration extends ApplicationConfigurationAdapter {
 	@Override
 	public String getFrameForTemplate(String templateFile, HttpAccessor htAccessor) {
 		//NB! both file names without .html extension
@@ -174,7 +174,7 @@ public class MySession { // this class holds session data
 	public String userFullName;
 }
 
-public class SlimwebInitializer implements ApplicationInitializer {
+public class SlimwebConfiguration implements ApplicationConfiguration {
 	@Override
 	public void registerInjectors(Map<Class<?>, ArgumentInjector> mapInjectors) {
 		mapInjectors.put(MySession.class, HttpAccessor::getSessionObject); // register MySession injector
@@ -190,7 +190,7 @@ public class MyComponent {
 }
 ```
 
-By default, all components are expected to require session existence. If session does not exist, browser is redirected to login page (declared in SlimwebInitializer).
+By default, all components are expected to require session existence. If session does not exist, browser is redirected to login page (declared in SlimwebConfiguration).
 Some components (like the login page itself) do not require session existence. Then add __@SessionNotRequired__ to entire component or alternatively just to a single method or a couple of methods.
 
 ## Redirecting
