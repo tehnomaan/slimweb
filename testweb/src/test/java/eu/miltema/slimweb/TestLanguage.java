@@ -34,4 +34,9 @@ public class TestLanguage extends BaseTest {
 		baseUrl = baseUrl.replace("controller", "view");
 		assertTrue(get("/tpt1").contains("nimi"));
 	}
+
+	@Test
+	public void testFrame() throws Exception {
+		assertTrue(get("/tpt1", "Accept-Language: et").contains("<footer>nimi</footer>"));
+	}
 }

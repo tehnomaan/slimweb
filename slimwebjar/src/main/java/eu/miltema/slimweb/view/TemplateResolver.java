@@ -34,7 +34,7 @@ class TemplateResolver {
 				String[] idsplit = id.split(":");
 				Function<String, String> replacer = replacers.get(idsplit[0] + ":");
 				if (replacer != null)
-					replacement = replacer.apply(idsplit[1]);
+					replacement = replacer.apply(idsplit.length > 1 ? idsplit[1] : null);
 			}
 			if (replacement == null)
 				replacement = "!!!" + id + "!!!";

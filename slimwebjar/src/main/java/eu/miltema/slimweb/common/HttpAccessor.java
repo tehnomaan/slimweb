@@ -18,8 +18,9 @@ abstract public class HttpAccessor {
 	private String pathInfo[];
 	private String httpMethod;
 
-	public HttpAccessor init(HttpServletRequest request) {
+	public HttpAccessor init(HttpServletRequest request, HttpServletResponse response) {
 		this.request = request;
+		this.response = response;
 		return this;
 	}
 

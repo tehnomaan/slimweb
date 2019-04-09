@@ -50,25 +50,13 @@ A name other than SlimwebInitializer is not recognized by Slimweb and initializa
 
 ```java
 package mypackage.components;
-public class SlimwebInitializer implements ApplicationInitializer {
+
+// For convenience, we are using ApplicationInitializerAdapter instead of ApplicationInitializer
+public class SlimwebInitializer extends ApplicationInitializerAdapter {
 	@Override
 	public String[] getComponentPackages() {
 		//Slimweb will only scan components in this Java package and its subpackages
 		return new String[] {"com.mypackage.components"};
-	}
-
-	@Override
-	public void registerInjectors(Map<Class<?>, ArgumentInjector> mapInjectors) {
-	}
-
-	@Override
-	public String getLoginView() {
-		return "login.html";
-	}
-
-	@Override
-	public String[] getValidOrigins() {
-		return new String[] {"https://mydomain.com"};
 	}
 }
 ```
@@ -111,7 +99,7 @@ A view is an HTML web page. These can be defined in project's _src/main/webapp_ 
 However, sometimes You need locale-specific views (English, Spanish, German) and You want to avoid the translation hassle in front-end technologies like Angular, React or Vue.
 Then You place HTML and JS templates into project's _src/main/resources/templates_ folder, to become accessible to Slimweb template engine. Valid extensions are .html, .htm and .js.
 Translation files go into project's _src/main/resources/labels_ folder.
-There is a separate label file for each locale, for example _en.lbl_, _de.lbl_ and _es.lbl_ (notice the .lbl extension). 
+There is a separate label file for each language, for example _en.lbl_, _de.lbl_ and _es.lbl_ (notice the .lbl extension). 
 
 Here is an example template file:
 
@@ -131,6 +119,31 @@ frontpage.title=Slimweb Demo
 frontpage.hellotext=Hello, world!
 ```
 
+Usually, views share a common frame (perhaps with header, footer and other components).
+The frame inclusion logic is declared in SlimwebInitializer and the frame itself in templates-folder:
+
+```java
+public class SlimwebInitializer extends ApplicationInitializerAdapter {
+	@Override
+	public String getFrameForTemplate(String templateFile, HttpAccessor htAccessor) {
+		//NB! both file names without .html extension
+		return htAccessor.getSessionObject() == null ? "loginframe" : "frame";
+	}
+}
+```
+
+```html
+<html>
+<body>
+{-template:-}
+</body>
+<footer>
+<a href="mailto:someone@example.com">Contact</a>
+</footer>
+</html>
+```
+In the above example, {-template:-} in frame file indicates the placeholder for page content
+
 ## Template File Rules
 
 * Each template must be an .html, .htm or .js file in project's _src/main/resources/templates_ folder
@@ -138,7 +151,7 @@ frontpage.hellotext=Hello, world!
 * Templates can be grouped into subfolders. However, each template name (without file extension) must be globally unique and subfolder names are excluded from URL mapping
 * Template engine replaces each _{-xyz-}_ occurence in template with a label from labels file, where xyz is a key in labels file
 * Labels files reside in project's _resources/labels_ folder and have a name en.lbl, de.lbl, es.lbl or other similar locale-specific name
-* To copy contents of another template into current template, use _{-file:myfile.html-}_ syntax. If referring to files in other folders, don't use folder in file path. For example, _{-file:otherfolder/myfile.html-}_ is invalid
+* To copy contents of another template into current template, use _{-file:myfile.html-}_ syntax. If referring to files in other folders, don't use folder in file path. For example, ~~{-file:otherfolder/myfile.html-}~~ is invalid
 
 ## Session
 

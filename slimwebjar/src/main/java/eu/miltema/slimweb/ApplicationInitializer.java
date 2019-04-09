@@ -2,6 +2,8 @@ package eu.miltema.slimweb;
 
 import java.util.Map;
 
+import eu.miltema.slimweb.common.HttpAccessor;
+
 public interface ApplicationInitializer {
 
 	/**
@@ -26,4 +28,11 @@ public interface ApplicationInitializer {
 	 * @return a list of valid origins, for example ["http://myhost.com", "https://myhost.com"]; these origins are used in CSRF attack detection algorithm
 	 */
 	String[] getValidOrigins();
+
+	/**
+	 * @param templateFile template file name, including extension, but excluding folder names
+	 * @param htAccessor http request/response details
+	 * @return frame template file name (without folders and .html extension)
+	 */
+	public String getFrameForTemplate(String templateFile, HttpAccessor htAccessor);
 }

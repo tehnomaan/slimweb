@@ -21,8 +21,18 @@ public class ComponentsReader {
 	}
 
 	public Stream<Class<?>> getComponentsAsStream() throws Exception {
-		if (cachedComponents != null)
-			return cachedComponents.stream();
+		if (cachedComponents == null)
+			init();
+		return cachedComponents.stream();
+	}
+
+	public ApplicationInitializer getInitializer() throws Exception {
+		if (initializer == null)
+			init();
+		return initializer;
+	}
+
+	private void init() throws Exception {
 		try {
 			logger.accept("Looking for SlimwebInitializer");
 			new ClassScanner(logger) {
@@ -44,13 +54,9 @@ public class ComponentsReader {
 		catch(InitializerFoundException ife) {}//initializer was found, let's continue
 		cachedComponents = new ArrayList<>();
 		logger.accept("Looking for @Component classes");
-		return new ClassScanner(logger).
+		new ClassScanner(logger).
 				scan(initializer.getComponentPackages()).
 				filter(c -> c.isAnnotationPresent(Component.class)).
-				peek(c -> cachedComponents.add(c));
-	}
-
-	public ApplicationInitializer getInitializer() {
-		return initializer;
+				forEach(c -> cachedComponents.add(c));
 	}
 }
