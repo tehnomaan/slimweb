@@ -58,6 +58,7 @@ public class ViewServlet extends HttpServlet {
 		return labelFile.lines().
 				filter(not(String::isBlank)).
 				map(line -> line.split("=")).
+				filter(ls -> ls.length < 2).
 				collect(toMap(ls -> ls[0].trim(), ls -> ls[1].trim()));
 	}
 
