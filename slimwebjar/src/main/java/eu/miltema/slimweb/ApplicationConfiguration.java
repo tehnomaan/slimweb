@@ -35,4 +35,18 @@ public interface ApplicationConfiguration {
 	 * @return frame template file name (without folders and .html extension)
 	 */
 	public String getFrameForTemplate(String templateFile, HttpAccessor htAccessor);
+
+	/**
+	 * This preprocessor is invoked for all components immediately prior get-, post-, put- or delete-method.
+	 * @param component component
+	 * @param htAccessor http request/response details
+	 */
+	public void preprocessComponent(Object component, HttpAccessor htAccessor);
+
+	/**
+	 * This postprocessor is invoked for all components immediately after get-, post-, put- or delete-method has finished.
+	 * @param component component
+	 * @param htAccessor http request/response details
+	 */
+	public void postprocessComponent(Object component, HttpAccessor htAccessor);
 }

@@ -24,4 +24,12 @@ abstract public class ApplicationConfigurationAdapter implements ApplicationConf
 	public String getFrameForTemplate(String templateFile, HttpAccessor htAccessor) {
 		return htAccessor.getSessionObject() == null ? "loginframe" : "frame";
 	}
+
+	@Override
+	public void preprocessComponent(Object component, HttpAccessor htAccessor) {
+	}
+
+	@Override
+	public void postprocessComponent(Object component, HttpAccessor htAccessor) {
+	}
 }

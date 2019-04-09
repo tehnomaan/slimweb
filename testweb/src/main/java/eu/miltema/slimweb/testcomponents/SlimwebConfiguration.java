@@ -32,4 +32,11 @@ public class SlimwebConfiguration implements ApplicationConfiguration {
 		return "frame";
 	}
 
+	@Override
+	public void preprocessComponent(Object component, HttpAccessor htAccessor) {
+	}
+
+	@Override
+	public void postprocessComponent(Object component, HttpAccessor htAccessor) {
+	}
 }
