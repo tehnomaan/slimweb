@@ -29,7 +29,7 @@ class TemplateResolver {
 			String id = m.group(2);
 			if (id.length() > 0 && id.charAt(0) == '.')
 				id = defaultPrefix + id;
-			String replacement = replaceValues.get(id);
+			String replacement = (replaceValues == null ? null : replaceValues.get(id));
 			if (replacement == null) {
 				String[] idsplit = id.split(":");
 				Function<String, String> replacer = replacers.get(idsplit[0] + ":");
