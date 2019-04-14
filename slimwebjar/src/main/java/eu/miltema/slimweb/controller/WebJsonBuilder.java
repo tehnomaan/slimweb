@@ -24,6 +24,21 @@ public class WebJsonBuilder {
 		}
 	}
 
+	class LocalTimeAdapter extends TypeAdapter<LocalTime> {
+		@Override
+		public LocalTime read(JsonReader jr) throws IOException {
+			if (jr.peek() == JsonToken.NULL) {
+				jr.nextNull();
+				return null;
+			}
+			return LocalTime.parse(jr.nextString(), DateTimeFormatter.ISO_TIME);
+		}
+		@Override
+		public void write(JsonWriter jw, LocalTime time) throws IOException {
+			jw.jsonValue(time == null ? null : '"' + time.format(DateTimeFormatter.ISO_TIME) + '"');
+		}
+	}
+
 	class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
 		@Override
 		public LocalDateTime read(JsonReader jr) throws IOException {
@@ -44,6 +59,7 @@ public class WebJsonBuilder {
 				serializeNulls().
 				setLenient().
 				registerTypeAdapter(LocalDate.class, new LocalDateAdapter()).
+				registerTypeAdapter(LocalTime.class, new LocalTimeAdapter()).
 				registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).
 				create();
 	}

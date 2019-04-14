@@ -65,8 +65,9 @@ public class TestBasicComponents extends BaseTest {
 
 	@Test
 	public void testSerializeDates() throws Exception {
-		String result = get("/component-types?date=2019-01-31&datetime=2019-03-31T23:58:24");
+		String result = get("/component-types?date=2019-01-31&time=09:02:00&datetime=2019-03-31T23:58:24");
 		assertTrue(result.contains("\"date\":\"2019-02-01\""));
+		assertTrue(result.contains("\"time\":\"09:07:00\""));
 		assertTrue(result.contains("\"datetime\":\"2019-04-01T00:03:24\""));
 	}
 }
