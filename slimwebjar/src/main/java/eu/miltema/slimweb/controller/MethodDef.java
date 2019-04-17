@@ -6,17 +6,14 @@ import java.util.Map;
 
 import eu.miltema.slimweb.ApplicationConfiguration;
 import eu.miltema.slimweb.ArgumentInjector;
-import eu.miltema.slimweb.annot.SessionNotRequired;
 import eu.miltema.slimweb.common.HttpAccessor;
 
 class MethodDef {
 	public Method method;
-	boolean requiresSession;
 	private ArgumentInjector[] injectors;
 
 	public MethodDef(Method method) {
 		this.method = method;
-		this.requiresSession = !method.isAnnotationPresent(SessionNotRequired.class);
 	}
 
 	public void init(Map<Class<?>, ArgumentInjector> mapInjectors) {

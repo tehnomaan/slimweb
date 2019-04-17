@@ -4,8 +4,7 @@ import java.time.*;
 
 import eu.miltema.slimweb.annot.*;
 
-@Component
-@SessionNotRequired
+@Component(requireSession = false)
 public class ComponentTypes {
 
 	String name;

@@ -3,8 +3,7 @@ package eu.miltema.slimweb.testcomponents;
 import eu.miltema.slimweb.annot.*;
 import eu.miltema.slimweb.common.HttpAccessor;
 
-@Component(urlName = "session")
-@SessionNotRequired
+@Component(urlName = "session", requireSession = false)
 public class ComponentSession {
 
 	public void post(HttpAccessor ht) {

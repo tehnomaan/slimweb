@@ -10,8 +10,7 @@ import eu.miltema.slimweb.push.*;
  * This component sends an int array back to push client 50ms after connection start 
  * @author Margus
  */
-@Component
-@SessionNotRequired
+@Component(requireSession = false)
 public class ComponentPush implements ServerPush {
 	@Override
 	public void pushStarted(PushHandle pushHandle, Map<String, String> parameters) throws Exception {

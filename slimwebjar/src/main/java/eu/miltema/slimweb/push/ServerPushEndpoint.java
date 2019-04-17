@@ -7,7 +7,7 @@ import javax.websocket.*;
 import javax.websocket.server.*;
 import org.slf4j.*;
 import eu.miltema.slimweb.*;
-import eu.miltema.slimweb.annot.SessionNotRequired;
+import eu.miltema.slimweb.annot.Component;
 import eu.miltema.slimweb.common.SlimwebUtil;
 
 //Vt kuidas saab kätte http sessiooni
@@ -33,7 +33,7 @@ public class ServerPushEndpoint {
 			PushHandleImpl ph = new PushHandleImpl(httpSession, session);
 			ph.componentName = componentName;
 			ph.componentClass = (Class<? extends ServerPush>) Optional.ofNullable(mapComponents.get(componentName)).orElseThrow(() -> new Exception("Cannot map " + componentName + " to any @Component"));
-			if (httpSession == null && !ph.componentClass.isAnnotationPresent(SessionNotRequired.class)) {
+			if (httpSession == null && ph.componentClass.getAnnotation(Component.class).requireSession()) {
 				session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Missing session"));
 				return;
 			}

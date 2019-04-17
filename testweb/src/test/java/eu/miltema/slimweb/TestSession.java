@@ -14,11 +14,6 @@ public class TestSession extends BaseTest {
 	}
 
 	@Test
-	public void testMethodNotRequiringSession() throws Exception {
-		assertTrue(get("/c2/no-session").contains("nono"));
-	}
-
-	@Test
 	public void testRequiresSessionButSessionMissing() throws Exception {
 		try {
 			get("/c2/with-session");
@@ -37,7 +32,7 @@ public class TestSession extends BaseTest {
 
 	@Test
 	public void testRequiresSessionJsonResult() throws Exception {
-		get("/c2/with-session", "Content-Type: application/json");
+		get("/c2/with-session", "Accept: application/json");
 		assertEquals(250, statusCode);
 		assertEquals("../../view/login", headers.firstValue("Location").get());
 	}

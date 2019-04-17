@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import eu.miltema.slimweb.annot.Component;
-import eu.miltema.slimweb.annot.SessionNotRequired;
 import eu.miltema.slimweb.common.SlimwebUtil;
 
 class ComponentDef {
@@ -15,7 +14,7 @@ class ComponentDef {
 
 	ComponentDef(Class<?> clazz) {
 		this.clazz = clazz;
-		this.requiresSession = !clazz.isAnnotationPresent(SessionNotRequired.class);
+		this.requiresSession = clazz.getAnnotation(Component.class).requireSession();
 		url = clazz.getAnnotation(Component.class).urlName();
 		if (url.isEmpty())
 			url = SlimwebUtil.hyphenate(clazz.getSimpleName());

@@ -27,7 +27,7 @@ public class TestBasicComponents extends BaseTest {
 
 	@Test
 	public void testGetWithCustomName() throws Exception {
-		assertTrue(get("/c2").contains("ZikZak"));
+		assertTrue(get("/c3").contains("zetuu"));
 	}
 
 	@Test

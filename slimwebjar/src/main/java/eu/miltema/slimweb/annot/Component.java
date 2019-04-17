@@ -17,4 +17,14 @@ public @interface Component {
 	 * @return component name in URL path, for example "mycomponent"
 	 */
 	String urlName() default "";
+
+	/**
+	 * @return true, when component access requires session existence
+	 */
+	boolean requireSession() default true;
+
+	/**
+	 * @return true, if this component is subject to web template generation. This is a directive to dedicated template generator, Slimweb itself does not generate web templates
+	 */
+	boolean generateTemplate() default true;
 }

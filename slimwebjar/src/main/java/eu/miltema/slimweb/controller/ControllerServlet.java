@@ -79,7 +79,7 @@ public class ControllerServlet extends HttpServlet {
 				MethodDef mdef = cdef.methods.get(htAccessor.getMethod() + ":" + (actionName == null ? "" : actionName));
 				if (mdef == null)
 					throw new HttpException(404, "Cannot map /{0} to action", actionName);
-				if (htAccessor.request.getSession(false) == null && cdef.requiresSession && mdef.requiresSession)
+				if (htAccessor.request.getSession(false) == null && cdef.requiresSession)
 					throw new Redirect(configuration.getLoginView());
 				Gson gson = new WebJsonBuilder().build();
 				String json = htAccessor.getParametersAsJson();
@@ -127,9 +127,10 @@ public class ControllerServlet extends HttpServlet {
 			if (redirect.pathToView.indexOf('/') < 0)
 				targetPath = (htAccessor.getActionName() == null ? "" : "../") + "../view/" + targetPath.replaceAll("(.+)\\.(html|htm|js)", "$1");
 		}
-		htAccessor.response.getWriter().write("s");
+		log.info("Redirecting to " + targetPath);
 		htAccessor.response.setHeader("Location", targetPath);
-		boolean acceptsJson = "application/json".equals(htAccessor.request.getContentType());
+		String accept = htAccessor.request.getHeader("Accept");
+		boolean acceptsJson = (accept != null && accept.toLowerCase().contains("application/json"));
 		htAccessor.response.setStatus(acceptsJson ? 250 : 303);
 	}
 }
