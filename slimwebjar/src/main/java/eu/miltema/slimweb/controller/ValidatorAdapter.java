@@ -46,6 +46,7 @@ public class ValidatorAdapter implements Validator {
 					try {
 						switch(vv) {
 						case MANDATORY:
+							allowNull = false;
 							logic = val -> val != null;
 							break;
 						case EMAIL:
@@ -78,9 +79,10 @@ public class ValidatorAdapter implements Validator {
 					}
 
 					String msgParam = (limitVal == (int) limitVal ? ((int) limitVal) + "" : limitVal + "");
+					boolean finalAllowNull = allowNull;
 					fieldValidators.add((o, l) -> {
 						try {
-							return validateField(o, field, l, allowNull, logic, errorKey, msgParam);
+							return validateField(o, field, l, finalAllowNull, logic, errorKey, msgParam);
 						}
 						catch(Exception x) {
 							throw new RuntimeException(x);
@@ -111,12 +113,19 @@ public class ValidatorAdapter implements Validator {
 			if (allowNull && fieldVal == null)
 				return null;
 			if (!logic.test(fieldVal))
-				return new MessagePair(field.getName(), labels.get(errorKey).replace("$", messageParam));
+				return new MessagePair(field.getName(), labels.getOrDefault(errorKey, "!!!" + errorKey + "!!!").replace("$", messageParam));
 			else return null;
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	protected Map<String, String> addError(Map<String, String> errors, String fieldName, String message) {
+		if (errors == null)
+			errors = new HashMap<>();
+		errors.put(fieldName, message);
+		return errors;
 	}
 }

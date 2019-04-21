@@ -34,9 +34,10 @@ abstract class BaseTest {
 		HttpRequest request = methodBuilder.apply(builder).build();
 		HttpResponse<String> httpResponse = httpClient.send(request, BodyHandlers.ofString());
 		headers = httpResponse.headers();
+		response = httpResponse.body();
 		if ((statusCode = httpResponse.statusCode()) >= 300)
 			throw new IOException("Http status code " + httpResponse.statusCode());
-		return (response = httpResponse.body());
+		return response;
 	}
 
 	protected String get(String componentPath, String ... headerKeyValues) throws InterruptedException, IOException {

@@ -97,8 +97,15 @@ public class ControllerServlet extends HttpServlet {
 				if (component == null)
 					component = cdef.clazz.getConstructor().newInstance();
 
-				if (mdef.validateInput)
-					cdef.validator.validate(component, labels.getLabels(htAccessor.getLanguage()));
+				if (mdef.validateInput) {
+					Map<String, String> vResult = cdef.validator.validate(component, labels.getLabels(htAccessor.getLanguage()));
+					if (vResult != null) {
+						log.debug("Error 400 [Validation failed] in " + requestName);
+						htAccessor.response.setStatus(400);
+						htAccessor.response.getWriter().write(gson.toJson(vResult));
+						return;
+					}
+				}
 
 				Object returnValue = mdef.invoke(component, htAccessor);
 				if (returnValue != null)
@@ -118,7 +125,7 @@ public class ControllerServlet extends HttpServlet {
 		}
 		catch(HttpException he) {
 			htAccessor.response.sendError(he.getHttpCode(), he.getMessage());
-			log.debug("Error " + he.getHttpCode() + "[" + he.getMessage() + "] in " + requestName);
+			log.debug("Error " + he.getHttpCode() + " [" + he.getMessage() + "] in " + requestName);
 		}
 		finally {
 			htAccessor.response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");

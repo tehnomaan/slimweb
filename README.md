@@ -265,6 +265,11 @@ public class MyComponent {
 }
 
 public class MyValidator extends ValidatorAdapter {
+
+	public MyValidator() {
+		super(MyComponent.class);// class to be validated
+	}
+
 	@Override
 	public Map<String, String> validate(Object object, Map<String, String> labels) throws Exception {
 		Map<String, String> errors = super.validate(object, labels);
