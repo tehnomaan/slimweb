@@ -20,7 +20,7 @@ public class TestSession extends BaseTest {
 		}
 		catch(IOException ioe) {
 			assertEquals("Http status code 303", ioe.getMessage());
-			assertEquals("../../view/login", headers.firstValue("Location").get());
+			assertEquals("/view/login", headers.firstValue("Location").get());
 		}
 	}
 
@@ -34,6 +34,6 @@ public class TestSession extends BaseTest {
 	public void testRequiresSessionJsonResult() throws Exception {
 		get("/c2/with-session", "Accept: application/json");
 		assertEquals(250, statusCode);
-		assertEquals("../../view/login", headers.firstValue("Location").get());
+		assertEquals("/view/login", headers.firstValue("Location").get());
 	}
 }

@@ -1,16 +1,16 @@
 package eu.miltema.slimweb.controller;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.Map;
 
-import eu.miltema.slimweb.ApplicationConfiguration;
-import eu.miltema.slimweb.ArgumentInjector;
+import eu.miltema.slimweb.*;
+import eu.miltema.slimweb.annot.ValidateInput;
 import eu.miltema.slimweb.common.HttpAccessor;
 
 class MethodDef {
 	public Method method;
 	private ArgumentInjector[] injectors;
+	boolean validateInput;
 
 	public MethodDef(Method method) {
 		this.method = method;
@@ -25,6 +25,7 @@ class MethodDef {
 				throw new IllegalArgumentException("Method " + method.toString() + " declares parameter of type " + types[i].getSimpleName() + ", which was not registered in " + ApplicationConfiguration.class.getSimpleName());
 			injectors[i] = injector;
 		}
+		validateInput = method.isAnnotationPresent(ValidateInput.class);
 	}
 
 	public Object invoke(Object component, HttpAccessor htAccessor) throws Throwable {

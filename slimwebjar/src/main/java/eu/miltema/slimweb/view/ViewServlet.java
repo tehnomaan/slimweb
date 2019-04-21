@@ -3,24 +3,21 @@ package eu.miltema.slimweb.view;
 import java.io.IOException;
 import java.util.*;
 
-import static java.util.function.Predicate.*;
 import static java.util.stream.Collectors.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import org.slf4j.*;
 import eu.miltema.cpscan.FileScanner;
-import eu.miltema.slimweb.ApplicationConfiguration;
-import eu.miltema.slimweb.ComponentsReader;
-import eu.miltema.slimweb.HttpException;
+import eu.miltema.slimweb.*;
 import eu.miltema.slimweb.common.HttpAccessor;
 
 @WebServlet(urlPatterns={"/view/*"})
 public class ViewServlet extends HttpServlet {
 
 	private static final Logger log = LoggerFactory.getLogger(ViewServlet.class);
-	private Map<String, Map<String, String>> localeLabels;
-	private Map<String, Map<String, String>> localetemplateFiles;
+	private Labels languageLabels;
+	private Map<String, Map<String, String>> languagetemplateFiles;
 	private ApplicationConfiguration configuration;
 
 	private class ViewHtAccessor extends HttpAccessor {
@@ -38,8 +35,8 @@ public class ViewServlet extends HttpServlet {
 	public void init() throws ServletException {
 		try {
 			configuration = new ComponentsReader(s -> log.debug(s)).getInitializer();
-			initLocaleLabels();
-			initLocaleTemplateFiles();
+			languageLabels = new Labels();
+			initTemplateFiles();
 			log.debug("ViewServlet initialization complete");
 		} catch (Exception e) {
 			log.error("", e);
@@ -47,36 +44,13 @@ public class ViewServlet extends HttpServlet {
 		}
 	}
 
-	private void initLocaleLabels() throws Exception {
-		final String LBLFILE_PATTERN = "(.*[/|\\\\])?([^/|\\\\]+)(\\.)lbl$";//separates file name from directories and extension
-		log.info("Looking for label files");
-		localeLabels = new FileScanner(s -> log.info(s), filename -> filename.endsWith(".lbl")).
-				scan("labels").
-				collect(toMap(t -> t.path.replaceAll(LBLFILE_PATTERN, "$2"), t -> getLabelsMap(t.path, t.content), (f1, f2) -> labelsConflict(f1, f2)));
-	}
-
-	private Map<String, String> labelsConflict(Map<String, String> labels1, Map<String, String> labels2) {
-		log.warn("Multiple files for the same locale");
-		return labels1;
-	}
-
-	private Map<String, String> getLabelsMap(String filename, String labelFile) {
-		log.debug("Processing file " + filename);
-		Map<String, String> ret = labelFile.lines().
-				filter(not(String::isBlank)).
-				map(line -> line.split("=|\\t")).
-				filter(ls -> ls.length >= 2).
-				collect(toMap(ls -> ls[0].trim(), ls -> ls[1].trim()));
-		return ret;
-	}
-
-	private void initLocaleTemplateFiles() throws Exception {
+	private void initTemplateFiles() throws Exception {
 		final String TPTFILE_PATTERN = "(.*[/|\\\\])?([^/|\\\\]+)(\\.)(html|htm|js)$";//separates file name from directories and extension
 		log.info("Looking for template files");
 		Map<String, String> templateFiles = new FileScanner(s -> log.info(s), filename -> filename.endsWith(".html") || filename.endsWith(".htm") || filename.endsWith(".js")).
 				scan("templates").
 				collect(toMap(t -> t.path.replaceAll(TPTFILE_PATTERN, "$2$3$4"), t -> t.content));//drop folder name from key
-		localetemplateFiles = localeLabels.entrySet().stream().
+		languagetemplateFiles = languageLabels.streamLanguages().
 				collect(toMap(locale -> locale.getKey(), locale -> resolveLanguageTemplates(locale.getValue(), templateFiles)));
 	}
 
@@ -100,9 +74,9 @@ public class ViewServlet extends HttpServlet {
 		String view = req.getPathInfo();
 		HttpAccessor htAccessor = new ViewHtAccessor().init(req, resp);
 		String lang = htAccessor.getLanguage();
-		Map<String, String> localeTemplates = Optional.ofNullable(localetemplateFiles.get(lang)).
-				orElseGet(() -> Optional.ofNullable(localetemplateFiles.get("en")).
-				orElseGet(() -> localetemplateFiles.values().iterator().next()));
+		Map<String, String> localeTemplates = Optional.ofNullable(languagetemplateFiles.get(lang)).
+				orElseGet(() -> Optional.ofNullable(languagetemplateFiles.get("en")).
+				orElseGet(() -> languagetemplateFiles.values().iterator().next()));
 		try {
 			if (view == null || view.length() < 2)
 				throw new HttpException(404, "View name missing");
@@ -118,8 +92,11 @@ public class ViewServlet extends HttpServlet {
 			resp.getWriter().print(html);
 		}
 		catch(HttpException he) {
-			resp.sendError(he.getHttpCode(), he.getMessage());
 			log.info(he.getHttpCode() + ": " + he.getMessage());
+			switch(he.getHttpCode()) {
+			case 404: resp.sendRedirect("../404.html"); break;
+			default: resp.sendRedirect("../error.html"); break;
+			}
 		}
 	}
 }

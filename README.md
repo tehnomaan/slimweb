@@ -20,11 +20,12 @@ Slimweb handles HTML page data mapping and routing to/from components.
 ## Features
 
 * HTML page data mapping and routing to/from components
-* Locale-specific views: a single template for multiple languages
-* Request logging
-* CSRF attack detection
-* Strongly typed session data management
-* Server push via websocket
+* Language-specific views: a single template for multiple languages
+* Automatic request logging
+* Automatic CSRF attack detection
+* [Strongly typed session data management](#session)
+* [Declarative and custom validation](#validation)
+* [Server push via websocket](#server-push)
 * Requires Java 11 or later
 
 ## Basic Usage
@@ -191,7 +192,7 @@ public class MyComponent {
 ```
 
 By default, all components are expected to require session existence. If session does not exist, browser is redirected to login page (declared in SlimwebConfiguration).
-Some components (like the login page itself) do not require session existence. Then add __@SessionNotRequired__ to entire component or alternatively just to a single method or a couple of methods.
+Some components (like the login page itself) do not require session existence. Then declare the component with __@Component(requireSession = false)__.
 
 ## Redirecting
 
@@ -230,4 +231,46 @@ public class MyComponent implements ServerPush {
 }
 ```
 
-By default, a component requires session existence or it won't accept websocket connection. Annotation @SessionNotRequired can be used to suppress session equirement.
+By default, a component requires session existence or it won't accept websocket connection. @Component(requireSession = false) can be used to suppress session requirement.
+
+## Validation
+
+Add server-side validation this way:
+
+```java
+@Component
+public class MyComponent {
+	@Validate({V.MANDATORY, V.EMAIL})
+	public String email = "john.smith@domain.com";
+
+	@ValidateInput
+	public MyForm post() {
+		...
+	}
+
+	public MyForm post2() {
+		...
+	}
+}
+```
+
+In the example above, Slimweb will validate field _email_ before entering method _post_. However, validation will not be performed for method _post2_.
+Slimweb is using its default validators.
+
+To add custom validators, add a validator class, implementing Validator-interface. If willing to use mixed validators (Slimweb built-in and custom), then extend custom class from ValidatorAdapter:
+
+```java
+@Component(validator = MyValidator.class)
+public class MyComponent {
+}
+
+public class MyValidator extends ValidatorAdapter {
+	@Override
+	public Map<String, String> validate(Object object, Map<String, String> labels) throws Exception {
+		Map<String, String> errors = super.validate(object, labels);
+		if (/* field validation logic */)
+			addError(errors, "myField", labels.get("error.myError"));
+		return errors;
+	}
+}
+```
