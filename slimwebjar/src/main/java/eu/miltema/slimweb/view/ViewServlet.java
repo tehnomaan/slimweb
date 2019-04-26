@@ -50,6 +50,7 @@ public class ViewServlet extends HttpServlet {
 		Map<String, String> templateFiles = new FileScanner(s -> log.info(s), filename -> filename.endsWith(".html") || filename.endsWith(".htm") || filename.endsWith(".js")).
 				scan("templates").
 				collect(toMap(t -> t.path.replaceAll(TPTFILE_PATTERN, "$2$3$4"), t -> t.content));//drop folder name from key
+		log.debug("Found " + templateFiles.size() + " template files");
 		languagetemplateFiles = languageLabels.streamLanguages().
 				collect(toMap(locale -> locale.getKey(), locale -> resolveLanguageTemplates(locale.getValue(), templateFiles)));
 	}
@@ -84,11 +85,14 @@ public class ViewServlet extends HttpServlet {
 			String template = localeTemplates.get(templateName);
 			if (template == null)
 				throw new HttpException(404, "Template " + templateName + " not found");
-			String frameName = configuration.getFrameForTemplate(template, htAccessor);
+			String frameName = configuration.getFrameForTemplate(templateName, htAccessor);
 			String frame = localeTemplates.get(frameName);
 			if (frame == null)
 				throw new HttpException(404, "Frame template " + frameName + " not found");
 			String html = new TemplateResolver().customReplacer("template:", filename -> template).replace(frame, null, templateName);
+
+			resp.setContentType("text/html");
+			resp.setCharacterEncoding("UTF-8");
 			resp.getWriter().print(html);
 		}
 		catch(HttpException he) {

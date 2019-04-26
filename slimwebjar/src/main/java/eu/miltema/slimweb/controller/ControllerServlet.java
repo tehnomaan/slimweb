@@ -37,6 +37,7 @@ public class ControllerServlet extends HttpServlet {
 					collect(toMap(c -> c.url, c -> c));
 			if (mapComponents.isEmpty())
 				log.warn("No component definitions were found");
+			else log.debug("Found " + mapComponents.size() + " components");
 
 			mapInjectors.put(HttpAccessor.class, a -> a);
 			mapInjectors.put(HttpServletRequest.class, a -> a.request);
@@ -74,6 +75,8 @@ public class ControllerServlet extends HttpServlet {
 	}
 
 	private void serviceRequest(HttpAccessor htAccessor) throws IOException {
+		htAccessor.response.setContentType("application/json");
+		htAccessor.response.setCharacterEncoding("UTF-8");
 		String requestName = htAccessor.getUrl();
 		log.info("Request " + requestName);
 		try {

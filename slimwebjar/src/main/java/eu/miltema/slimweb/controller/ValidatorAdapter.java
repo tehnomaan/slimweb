@@ -39,7 +39,7 @@ public class ValidatorAdapter implements Validator {
 					continue;
 				int limiterIdx = 0;
 				for(V vv : v.value()) {
-					String errorKey = vv.toString().toLowerCase();
+					String errorKey = "error." + vv.toString().toLowerCase();
 					boolean allowNull = true;
 					Predicate<Object> logic;
 					double limitVal = 0;

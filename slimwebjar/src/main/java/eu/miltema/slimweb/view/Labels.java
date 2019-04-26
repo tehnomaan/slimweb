@@ -24,8 +24,10 @@ public class Labels {
 	private static Map<String, Map<String, String>> map;
 
 	public Labels() throws Exception {
-		if (map == null)
+		if (map == null) {
 			map = load();
+			log.debug("Found " + map.size() + " label file(s)");
+		}
 	}
 
 	private Map<String, Map<String, String>> load() throws Exception {
