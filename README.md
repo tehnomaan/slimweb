@@ -69,7 +69,7 @@ Add Slimweb dependency into build.gradle:
 ```gradle
 apply plugin: 'war'
 dependencies {
-    implementation 'eu.miltema:slimweb:0.1.0'
+    implementation 'eu.miltema:slimweb:0.3.1'
 }
 ```
 
