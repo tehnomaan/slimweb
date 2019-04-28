@@ -25,8 +25,8 @@ public class ValidatorAdapter implements Validator {
 		}
 	}
 
-	private static final Pattern MAILMATCH = Pattern.compile("[a-zA-Z_0-9\\.]+@\\w+(\\.\\w+)+");
-	private Collection<FieldValidator> fieldValidators;
+	private transient static final Pattern MAILMATCH = Pattern.compile("[a-zA-Z_0-9\\.]+@\\w+(\\.\\w+)+");
+	private transient Collection<FieldValidator> fieldValidators;
 
 	public ValidatorAdapter(Class<?> classToValidate) {
 		fieldValidators = new ArrayList<ValidatorAdapter.FieldValidator>();

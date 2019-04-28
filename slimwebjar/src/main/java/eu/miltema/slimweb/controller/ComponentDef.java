@@ -33,6 +33,8 @@ class ComponentDef {
 		for(Method method : clazz.getMethods()) {
 			if (method.getDeclaringClass() == Object.class)
 				continue;
+			if ("validate".equals(method.getName()) && Validator.class.isAssignableFrom(clazz))
+				continue;
 			MethodDef mdef = new MethodDef(method);
 			String name = method.getName();
 			if (name.startsWith("get"))
