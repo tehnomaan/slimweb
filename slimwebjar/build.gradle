@@ -18,7 +18,7 @@ dependencies {
 
 group = "eu.miltema"
 archivesBaseName = "slimweb"
-version = "0.3.1"
+version = "0.3.2-SNAPSHOT"
 
 modifyPom {
 	project {
