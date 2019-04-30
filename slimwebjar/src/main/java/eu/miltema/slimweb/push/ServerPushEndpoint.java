@@ -25,7 +25,7 @@ public class ServerPushEndpoint {
 	public void onOpen(final Session session, @PathParam("__component") String componentName, EndpointConfig config) {
 		try {
 			if (mapComponents == null)
-				mapComponents = new ComponentsReader(s -> log.info(s)).getComponentsAsStream().collect(toMap(c -> SlimwebUtil.hyphenate(c.getSimpleName()), c -> c));
+				mapComponents = new ComponentsReader(s -> log.info(s)).getComponentsAsStream().collect(toMap(c -> urlName(c), c -> c));
 			Map<String, Object> uprops = session.getUserProperties();
 			HttpSession httpSession = (HttpSession) uprops.get(PushConst.PROPERTY_HTTP_SESSION);
 			Map<String, List<String>> originalParams = (Map<String, List<String>>) uprops.get(PushConst.PROPERTY_PARAMETERS);
@@ -46,6 +46,12 @@ public class ServerPushEndpoint {
 		}
 	}
 
+	private String urlName(Class<?> component) {
+		Component ca = component.getAnnotation(Component.class);
+		if (ca != null && !ca.urlName().isEmpty())
+			return ca.urlName();
+		else return SlimwebUtil.hyphenate(component.getSimpleName());
+	}
 	@OnMessage
 	public void onPong(Session session, PongMessage pongMsg) {
 	}
@@ -77,4 +83,5 @@ public class ServerPushEndpoint {
 	@OnError
 	public void onError(Session session, Throwable thr) {
 	}
+
 }

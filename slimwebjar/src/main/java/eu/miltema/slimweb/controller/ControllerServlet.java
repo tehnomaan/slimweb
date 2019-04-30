@@ -12,6 +12,7 @@ import org.slf4j.*;
 import com.google.gson.Gson;
 import eu.miltema.slimweb.*;
 import eu.miltema.slimweb.common.HttpAccessor;
+import eu.miltema.slimweb.push.ServerPush;
 import eu.miltema.slimweb.view.Labels;
 
 @WebServlet(urlPatterns={"/controller/*"})
@@ -113,6 +114,8 @@ public class ControllerServlet extends HttpServlet {
 				Object returnValue = mdef.invoke(component, htAccessor);
 				if (returnValue != null)
 					htAccessor.response.getWriter().write(gson.toJson(returnValue));
+				if (component instanceof ServerPush)
+					htAccessor.response.addHeader("X-Slim-Push", "push");
 			}
 			catch(Redirect redirect) {
 				redirect(htAccessor, redirect);

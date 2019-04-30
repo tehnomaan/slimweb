@@ -13,6 +13,7 @@ public class PushHandleImpl implements PushHandle {
 	private Session websocketSession;
 	private Gson gson = new Gson();
 	private HttpSession httpSession;
+	private Object customData;
 	Class<? extends ServerPush> componentClass;
 	String componentName;
 
@@ -44,7 +45,38 @@ public class PushHandleImpl implements PushHandle {
 	}
 
 	@Override
-	public HttpSession getSession() {
+	public HttpSession getHttpSession() {
 		return httpSession;
+	}
+
+	@Override
+	public void setCustomData(Object customData) {
+		this.customData = customData;
+	}
+
+	@Override
+	public Object getCustomData() {
+		return customData;
+	}
+
+	@Override
+	public String getLanguage() {
+		try {
+			String language = (httpSession == null ? null : (String) httpSession.getAttribute("__SESSION_OBJECT"));
+			return (language == null ? "en" : language);
+		}
+		catch(IllegalStateException ise) {
+			return null;
+		}
+	}
+
+	@Override
+	public Object getSessionObject() {
+		try {
+			return (httpSession == null ? null : httpSession.getAttribute("__SESSION_OBJECT"));
+		}
+		catch(IllegalStateException ise) {
+			return null;
+		}
 	}
 }

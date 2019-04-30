@@ -23,5 +23,26 @@ public interface PushHandle {
 	/**
 	 * @return http session associated with this push connection
 	 */
-	public HttpSession getSession();
+	public HttpSession getHttpSession();
+
+	/**
+	 * Set custom data, which would be accessible in both, pushStarted() and pushTerminated()
+	 * @param customData custom data
+	 */
+	public void setCustomData(Object customData);
+
+	/**
+	 * @return custom data
+	 */
+	public Object getCustomData();
+
+	/**
+	 * @return current language
+	 */
+	public String getLanguage();
+
+	/**
+	 * @return session object, which was registered in SlimwebConfiguration
+	 */
+	public Object getSessionObject();
 }
