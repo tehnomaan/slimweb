@@ -6,6 +6,8 @@ import javax.websocket.Session;
 import org.slf4j.*;
 import com.google.gson.Gson;
 
+import eu.miltema.slimweb.common.SlimwebUtil;
+
 public class PushHandleImpl implements PushHandle {
 
 	private static final Logger log = LoggerFactory.getLogger(PushHandleImpl.class);
@@ -77,6 +79,30 @@ public class PushHandleImpl implements PushHandle {
 		}
 		catch(IllegalStateException ise) {
 			return null;
+		}
+	}
+
+	@Override
+	public void setSessionObject(Object sessionObject) {
+		if (httpSession != null)
+			httpSession.setAttribute("__SESSION_OBJECT", sessionObject);
+	}
+
+	@Override
+	public void redirect(String url) {
+		try {
+			websocketSession.getBasicRemote().sendText("__redirect:" + url);
+		} catch (IOException e) {
+			log.error("", e);
+		}
+	}
+
+	@Override
+	public void redirect(Class<?> componentClass, String parameters) {
+		try {
+			websocketSession.getBasicRemote().sendText("__redirect:" + SlimwebUtil.urlName(componentClass) + (parameters == null ? "" : "?" + parameters));
+		} catch (IOException e) {
+			log.error("", e);
 		}
 	}
 }

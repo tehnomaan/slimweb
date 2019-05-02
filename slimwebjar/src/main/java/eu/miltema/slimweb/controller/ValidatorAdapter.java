@@ -47,7 +47,7 @@ public class ValidatorAdapter implements Validator {
 						switch(vv) {
 						case MANDATORY:
 							allowNull = false;
-							logic = val -> val != null;
+							logic = val -> (val != null && !val.toString().trim().isEmpty());
 							break;
 						case EMAIL:
 							logic = val -> MAILMATCH.matcher(val.toString()).matches();

@@ -16,9 +16,7 @@ class ComponentDef {
 	ComponentDef(Class<?> clazz) {
 		this.clazz = clazz;
 		this.requiresSession = clazz.getAnnotation(Component.class).requireSession();
-		url = clazz.getAnnotation(Component.class).urlName();
-		if (url.isEmpty())
-			url = SlimwebUtil.hyphenate(clazz.getSimpleName());
+		url = SlimwebUtil.urlName(clazz);
 
 		try {
 			Class<? extends Validator> validatorClass = clazz.getAnnotation(Component.class).validator();
