@@ -47,10 +47,15 @@ public class Labels {
 		log.debug("Processing file " + filename);
 		Map<String, String> ret = labelFile.lines().
 				filter(not(String::isBlank)).
-				map(line -> line.split("=|\\t")).
+				map(line -> splitLine(line)).
 				filter(ls -> ls.length >= 2).
 				collect(toMap(ls -> ls[0].trim(), ls -> ls[1].trim()));
 		return ret;
+	}
+
+	private String[] splitLine(String line) {
+		int idx = line.indexOf('=');
+		return new String[] {line.substring(0, idx).trim(), line.substring(idx + 1).trim().split("\\t")[0].trim()};
 	}
 
 	public Stream<Entry<String, Map<String, String>>> streamLanguages() {
