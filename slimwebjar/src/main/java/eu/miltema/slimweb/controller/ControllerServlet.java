@@ -11,44 +11,36 @@ import javax.servlet.http.*;
 import org.slf4j.*;
 import com.google.gson.Gson;
 import eu.miltema.slimweb.*;
-import eu.miltema.slimweb.common.HttpAccessor;
+import eu.miltema.slimweb.common.*;
 import eu.miltema.slimweb.push.ServerPush;
-import eu.miltema.slimweb.view.Labels;
 
 @WebServlet(urlPatterns={"/controller/*"})
 public class ControllerServlet extends HttpServlet {
 
 	private static final Logger log = LoggerFactory.getLogger(ControllerServlet.class);
-	private Map<String, ComponentDef> mapComponents;//urlName->component
-	private Map<Class<?>, ComponentDef> mapComponentClasses = new HashMap<Class<?>, ComponentDef>();//class->component
+	private SharedResources shared;
+	private Map<Class<?>, ComponentDef> mapComponentClasses;//class->component
 	private Map<Class<?>, ArgumentInjector> mapInjectors = new HashMap<>();
-	private ApplicationConfiguration configuration;
 	private String[] validOrigins;
-	private Labels labels;
 
 	private static Predicate<MethodDef> excludePush = mdef -> !mdef.method.getName().equals("pushStarted") && !mdef.method.getName().equals("pushTerminated");
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
-			ComponentsReader cr = new ComponentsReader(s -> log.debug(s));
-			mapComponents = cr.getComponentsAsStream().
-					map(c -> new ComponentDef(c)).
-					peek(c -> mapComponentClasses.put(c.clazz, c)).
-					collect(toMap(c -> c.url, c -> c));
-			if (mapComponents.isEmpty())
-				log.warn("No component definitions were found");
-			else log.debug("Found " + mapComponents.size() + " components");
+			shared = SharedResources.instance();
+			mapComponentClasses = shared.mapComponents.values().stream().collect(toMap(c -> c.clazz, c -> c));
 
-			mapInjectors.put(HttpAccessor.class, a -> a);
-			mapInjectors.put(HttpServletRequest.class, a -> a.request);
-			mapInjectors.put(HttpServletResponse.class, a -> a.response);
-			mapInjectors.put(HttpSession.class, a -> a.request.getSession(false));
-			configuration = cr.getInitializer();
-			configuration.registerInjectors(mapInjectors);
-			validOrigins = configuration.getValidOrigins();
-			mapComponents.values().forEach(cdef -> cdef.methods.values().stream().filter(excludePush).forEach(mdef -> mdef.init(mapInjectors)));
-			labels = new Labels();
+			mapInjectors.put(HttpAccessor.class, h -> h);
+			mapInjectors.put(HttpServletRequest.class, h -> h.request);
+			mapInjectors.put(HttpServletResponse.class, h -> h.response);
+			mapInjectors.put(HttpSession.class, h -> h.request.getSession(false));
+			mapInjectors.put(LanguageLabels.class, h -> shared.labels.getLabels(h.getLanguage()));
+
+			shared.configuration.registerInjectors(mapInjectors);
+			validOrigins = shared.configuration.getValidOrigins();
+
+			shared.mapComponents.values().forEach(cdef -> cdef.methods.values().stream().filter(excludePush).forEach(mdef -> mdef.init(mapInjectors)));
 		} catch (Exception e) {
 			log.error("", e);
 			throw new ServletException(e);
@@ -84,7 +76,7 @@ public class ControllerServlet extends HttpServlet {
 			try {
 				String componentName = htAccessor.getComponentName();
 				String actionName = htAccessor.getActionName();
-				ComponentDef cdef = mapComponents.get(componentName);
+				ComponentDef cdef = shared.mapComponents.get(componentName);
 				if (cdef == null)
 					throw new HttpException(404, "Cannot map /{0} to component", componentName);
 				MethodDef mdef = cdef.methods.get(htAccessor.getMethod() + ":" + (actionName == null ? "" : actionName));
@@ -94,7 +86,7 @@ public class ControllerServlet extends HttpServlet {
 					else throw new HttpException(405, "Component {0} does not support method {1}", componentName, htAccessor.getMethod());
 				}
 				if (htAccessor.request.getSession(false) == null && cdef.requiresSession)
-					throw new Redirect(configuration.getLoginView());
+					throw new Redirect(shared.configuration.getLoginView());
 				Gson gson = new WebJsonBuilder().build();
 				String json = htAccessor.getParametersAsJson();
 				Object component = gson.fromJson(json, cdef.clazz);
@@ -102,7 +94,7 @@ public class ControllerServlet extends HttpServlet {
 					component = cdef.clazz.getConstructor().newInstance();
 
 				if (mdef.validateInput) {
-					Map<String, String> vResult = cdef.validator.validate(component, labels.getLabels(htAccessor.getLanguage()));
+					Map<String, String> vResult = cdef.validator.validate(component, shared.labels.getLabels(htAccessor.getLanguage()));
 					if (vResult != null) {
 						log.debug("Error 400 [Validation failed] in " + requestName);
 						htAccessor.response.setStatus(400);

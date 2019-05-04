@@ -1,17 +1,18 @@
-package eu.miltema.slimweb.controller;
+package eu.miltema.slimweb.common;
 
 import java.lang.reflect.Method;
 import java.util.*;
 
 import eu.miltema.slimweb.annot.Component;
-import eu.miltema.slimweb.common.SlimwebUtil;
+import eu.miltema.slimweb.controller.Validator;
+import eu.miltema.slimweb.controller.ValidatorAdapter;
 
-class ComponentDef {
-	Class<?> clazz;
-	boolean requiresSession;
-	String url;
-	Map<String, MethodDef> methods = new HashMap<>();
-	Validator validator;
+public class ComponentDef {
+	public Class<?> clazz;
+	public boolean requiresSession;
+	public String url;
+	public Map<String, MethodDef> methods = new HashMap<>();
+	public Validator validator;
 
 	ComponentDef(Class<?> clazz) {
 		this.clazz = clazz;

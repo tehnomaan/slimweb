@@ -62,14 +62,14 @@ public class SlimwebConfiguration extends ApplicationConfigurationAdapter {
 }
 ```
 
-## Dependencies
+## Build Dependencies
 
 Add Slimweb dependency into build.gradle:
 
 ```gradle
 apply plugin: 'war'
 dependencies {
-    implementation 'eu.miltema:slimweb:0.3.4'
+    implementation 'eu.miltema:slimweb:0.3.5'
 }
 ```
 
@@ -81,7 +81,7 @@ Slimweb itself depends on couple of libraries, which are resolved by build syste
 
 In "Basic Usage", session argument injector was introduced.
 In fact, it is possible to declare methods with any argument type as long as appropriate injector has been registered with ApplicationConfiguration.
-By default, Slimweb supports these method argument types: HttpSession, HttpServletRequest, HttpServletResponse, HttpAccessor
+By default, Slimweb supports these method argument types: HttpSession, HttpServletRequest, HttpServletResponse, HttpAccessor, LanguageLabels.
 
 In component, methods have special naming convention. Below is a table with some url-to-method mapping examples (in class MyComponent):
 
@@ -92,6 +92,44 @@ In component, methods have special naming convention. Below is a table with some
 | POST   | /controller/my-component/user  | postUser()   |
 | PUT    | /controller/my-component       | put()        |
 | DELETE | /controller/my-component/user  | deleteUser() |
+
+## Dependency Injection
+
+Each of the methods can be declared with parameters. By default, these built-in parameter types are supported:
+
+* HttpSession
+* HttpServletRequest
+* HttpServletResponse
+* HttpAccessor
+* LanguageLabels
+
+Example:
+
+```java
+public MyComponent get(HttpAccessor htAccessor) {
+	String urlParam = htAccessor.getParameter("my_url_parameter");
+	...
+}
+```
+
+Often You need to inject Your custom dependencies. For example, You might want to use [SlimORM](https://github.com/tehnomaan/slimorm) database link like this:
+
+```java
+public MyComponent get(Database db) {
+	...
+}
+```
+
+Then You must declare appropriate injector in SlimwebConfiguration:
+
+```java
+public class SlimwebConfiguration implements ApplicationConfiguration {
+	@Override
+	public void registerInjectors(Map<Class<?>, ArgumentInjector> mapInjectors) {
+		mapInjectors.put(Database.class, hta -> new Database("java:comp/env/jdbc/mydb")); // register Database injector
+	}
+}
+```
 
 ## Views
 

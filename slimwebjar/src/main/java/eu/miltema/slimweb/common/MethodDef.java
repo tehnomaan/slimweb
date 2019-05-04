@@ -1,16 +1,15 @@
-package eu.miltema.slimweb.controller;
+package eu.miltema.slimweb.common;
 
 import java.lang.reflect.*;
 import java.util.Map;
 
 import eu.miltema.slimweb.*;
 import eu.miltema.slimweb.annot.ValidateInput;
-import eu.miltema.slimweb.common.HttpAccessor;
 
-class MethodDef {
+public class MethodDef {
 	public Method method;
 	private ArgumentInjector[] injectors;
-	boolean validateInput;
+	public boolean validateInput;
 
 	public MethodDef(Method method) {
 		this.method = method;

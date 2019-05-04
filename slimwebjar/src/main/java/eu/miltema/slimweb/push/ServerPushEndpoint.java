@@ -6,9 +6,8 @@ import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.*;
 import org.slf4j.*;
-import eu.miltema.slimweb.*;
 import eu.miltema.slimweb.annot.Component;
-import eu.miltema.slimweb.common.SlimwebUtil;
+import eu.miltema.slimweb.common.SharedResources;
 
 //Vt kuidas saab kätte http sessiooni
 //1) http://stackoverflow.com/questions/21888425/accessing-servletcontext-and-httpsession-in-onmessage-of-a-jsr-356-serverendpo
@@ -18,21 +17,31 @@ public class ServerPushEndpoint {
 
 	private static final Logger log = LoggerFactory.getLogger(ServerPushEndpoint.class);
 
-	private Map<String, Class<?>> mapComponents;
+	private SharedResources shared;
+
+	public ServerPushEndpoint() {
+		try {
+			shared = SharedResources.instance();
+		} catch (Exception e) {
+			log.error("", e);
+			throw new RuntimeException(e);
+		}
+	}
 
 	@OnOpen
 	@SuppressWarnings("unchecked")
 	public void onOpen(final Session session, @PathParam("__component") String componentName, EndpointConfig config) {
 		try {
-			if (mapComponents == null)
-				mapComponents = new ComponentsReader(s -> log.info(s)).getComponentsAsStream().collect(toMap(c -> SlimwebUtil.urlName(c), c -> c));
 			Map<String, Object> uprops = session.getUserProperties();
 			HttpSession httpSession = (HttpSession) uprops.get(PushConst.PROPERTY_HTTP_SESSION);
 			Map<String, List<String>> originalParams = (Map<String, List<String>>) uprops.get(PushConst.PROPERTY_PARAMETERS);
 			Map<String, String> params = originalParams.entrySet().stream().filter(e -> !e.getKey().startsWith("__")).collect(toMap(e -> e.getKey(), e -> e.getValue().stream().collect(joining(","))));
 			PushHandleImpl ph = new PushHandleImpl(httpSession, session);
 			ph.componentName = componentName;
-			ph.componentClass = (Class<? extends ServerPush>) Optional.ofNullable(mapComponents.get(componentName)).orElseThrow(() -> new Exception("Cannot map " + componentName + " to any @Component"));
+			ph.componentClass = (Class<? extends ServerPush>) Optional
+					.ofNullable(shared.mapComponents.get(componentName))
+					.orElseThrow(() -> new Exception("Cannot map " + componentName + " to any @Component"))
+					.clazz;
 			if (httpSession == null && ph.componentClass.getAnnotation(Component.class).requireSession()) {
 				session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Missing session"));
 				return;
@@ -65,7 +74,7 @@ public class ServerPushEndpoint {
 				return;
 			log.info("Terminating /push/" + ph.componentName);
 			if (ph.componentName != null) {
-				Class<?> componentClass = mapComponents.get(ph.componentName);
+				Class<?> componentClass = shared.mapComponents.get(ph.componentName).clazz;
 				ServerPush component = (ServerPush) componentClass.getConstructor().newInstance();
 				component.pushTerminated(ph);
 			}

@@ -1,4 +1,4 @@
-package eu.miltema.slimweb;
+package eu.miltema.slimweb.common;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;

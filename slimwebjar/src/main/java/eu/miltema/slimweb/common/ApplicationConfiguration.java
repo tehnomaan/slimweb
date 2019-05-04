@@ -1,8 +1,8 @@
-package eu.miltema.slimweb;
+package eu.miltema.slimweb.common;
 
 import java.util.Map;
 
-import eu.miltema.slimweb.common.HttpAccessor;
+import eu.miltema.slimweb.ArgumentInjector;
 
 public interface ApplicationConfiguration {
 

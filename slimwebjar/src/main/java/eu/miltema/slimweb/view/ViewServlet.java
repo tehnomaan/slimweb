@@ -11,14 +11,16 @@ import org.slf4j.*;
 import eu.miltema.cpscan.FileScanner;
 import eu.miltema.slimweb.*;
 import eu.miltema.slimweb.common.HttpAccessor;
+import eu.miltema.slimweb.common.AllLabels;
+import eu.miltema.slimweb.common.SharedResources;
 
 @WebServlet(urlPatterns={"/view/*"})
 public class ViewServlet extends HttpServlet {
 
 	private static final Logger log = LoggerFactory.getLogger(ViewServlet.class);
-	private Labels languageLabels;
+	private AllLabels languageLabels;
 	private Map<String, Map<String, String>> languagetemplateFiles;
-	private ApplicationConfiguration configuration;
+	private SharedResources shared;
 
 	private class ViewHtAccessor extends HttpAccessor {
 		@Override
@@ -34,8 +36,8 @@ public class ViewServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		try {
-			configuration = new ComponentsReader(s -> log.debug(s)).getInitializer();
-			languageLabels = new Labels();
+			shared = SharedResources.instance();
+			languageLabels = new AllLabels();
 			initTemplateFiles();
 			log.debug("ViewServlet initialization complete");
 		} catch (Exception e) {
@@ -85,7 +87,7 @@ public class ViewServlet extends HttpServlet {
 			String template = localeTemplates.get(templateName);
 			if (template == null)
 				throw new HttpException(404, "Template " + templateName + " not found");
-			String frameName = configuration.getFrameForTemplate(templateName, htAccessor);
+			String frameName = shared.configuration.getFrameForTemplate(templateName, htAccessor);
 			String frame = localeTemplates.get(frameName);
 			if (frame == null)
 				throw new HttpException(404, "Frame template " + frameName + " not found");

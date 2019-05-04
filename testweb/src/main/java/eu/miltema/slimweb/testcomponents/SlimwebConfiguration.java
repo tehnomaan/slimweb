@@ -3,6 +3,7 @@ package eu.miltema.slimweb.testcomponents;
 import java.util.Map;
 
 import eu.miltema.slimweb.*;
+import eu.miltema.slimweb.common.ApplicationConfiguration;
 import eu.miltema.slimweb.common.HttpAccessor;
 
 public class SlimwebConfiguration implements ApplicationConfiguration {
