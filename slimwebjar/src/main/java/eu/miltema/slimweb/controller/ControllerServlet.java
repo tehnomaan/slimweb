@@ -89,7 +89,14 @@ public class ControllerServlet extends HttpServlet {
 					throw new Redirect(shared.configuration.getLoginView());
 				Gson gson = new WebJsonBuilder().build();
 				String json = htAccessor.getParametersAsJson();
-				Object component = gson.fromJson(json, cdef.clazz);
+
+				Object component = null;
+				try {
+					component = gson.fromJson(json, cdef.clazz);
+				}
+				catch(Exception x) {
+					log.debug("Unable to build component from input json");
+				}
 				if (component == null)
 					component = cdef.clazz.getConstructor().newInstance();
 
@@ -104,8 +111,7 @@ public class ControllerServlet extends HttpServlet {
 				}
 
 				Object returnValue = mdef.invoke(component, htAccessor);
-				if (returnValue != null)
-					htAccessor.response.getWriter().write(gson.toJson(returnValue));
+				htAccessor.response.getWriter().write(returnValue == null ? "{}" : gson.toJson(returnValue));//cannot send empty body, otherwise $.ajax returns error
 				if (component instanceof ServerPush)
 					htAccessor.response.addHeader("X-Slim-Push", "push");
 			}

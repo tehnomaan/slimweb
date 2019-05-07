@@ -11,7 +11,7 @@ import eu.miltema.slimweb.common.HttpAccessor;
 class HttpPostAccessor extends HttpAccessor {
 
 	private String json;
-	private Map<String, String> parameters;
+	private Map<String, Object> parameters;
 
 	@Override
 	public String getParametersAsJson() {
@@ -35,7 +35,8 @@ class HttpPostAccessor extends HttpAccessor {
 	public String getParameter(String parameterName) {
 		if (parameters == null)
 			parameters = new Gson().fromJson(getParametersAsJson(), Map.class);
-		return parameters.get(parameterName);
+		Object parameter = parameters.get(parameterName);
+		return (parameter == null ? null : parameter.toString());
 	}
 
 }

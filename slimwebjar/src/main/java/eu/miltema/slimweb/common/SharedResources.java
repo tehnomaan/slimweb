@@ -9,7 +9,7 @@ public class SharedResources {
 	private static SharedResources instance;
 	private static final Logger log = LoggerFactory.getLogger(SharedResources.class);
 
-	public static SharedResources instance() throws Exception {
+	synchronized public static SharedResources instance() throws Exception {
 		if (instance == null)
 			instance = new SharedResources();
 		return instance;
