@@ -68,8 +68,13 @@ public class ControllerServlet extends HttpServlet {
 	}
 
 	private void serviceRequest(HttpAccessor htAccessor) throws IOException {
+		long tm = System.currentTimeMillis();
 		htAccessor.response.setContentType("application/json");
 		htAccessor.response.setCharacterEncoding("UTF-8");
+		htAccessor.response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+		htAccessor.response.setDateHeader("Expires", tm);
+		htAccessor.response.setDateHeader("Last-Modified", tm);
+
 		String requestName = htAccessor.getUrl();
 		log.info("Request " + requestName);
 		try {
@@ -111,9 +116,9 @@ public class ControllerServlet extends HttpServlet {
 				}
 
 				Object returnValue = mdef.invoke(component, htAccessor);
-				htAccessor.response.getWriter().write(returnValue == null ? "{}" : gson.toJson(returnValue));//cannot send empty body, otherwise $.ajax returns error
 				if (component instanceof ServerPush)
 					htAccessor.response.addHeader("X-Slim-Push", "push");
+				htAccessor.response.getWriter().write(returnValue == null ? "{}" : gson.toJson(returnValue));//cannot send empty body, otherwise $.ajax returns error
 			}
 			catch(Redirect redirect) {
 				redirect(htAccessor, redirect);
@@ -132,10 +137,6 @@ public class ControllerServlet extends HttpServlet {
 			log.debug("Error " + he.getHttpCode() + " [" + he.getMessage() + "] in " + requestName);
 		}
 		finally {
-			htAccessor.response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
-			long tm = System.currentTimeMillis();
-			htAccessor.response.setDateHeader("Expires", tm);
-			htAccessor.response.setDateHeader("Last-Modified", tm);
 			htAccessor.response.flushBuffer();
 		}
 	}
